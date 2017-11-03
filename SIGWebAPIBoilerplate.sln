@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIG.Repository", "SIG.Repos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIG.EntityFrameworkCore.AutoHistory", "SIG.EntityFrameworkCore.AutoHistory\SIG.EntityFrameworkCore.AutoHistory.csproj", "{F3E981FC-ED9E-489B-A130-6395AF2EA700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIG.Resources", "SIG.Resources\SIG.Resources.csproj", "{F73D5A2D-2A97-47AD-B959-4364DDEE6BB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIG.Resources", "SIG.Resources\SIG.Resources.csproj", "{F73D5A2D-2A97-47AD-B959-4364DDEE6BB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIG.Services", "SIG.Services\SIG.Services.csproj", "{9A4AFD3E-D8D4-4837-B1BD-4D57D0F34DE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{F73D5A2D-2A97-47AD-B959-4364DDEE6BB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F73D5A2D-2A97-47AD-B959-4364DDEE6BB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F73D5A2D-2A97-47AD-B959-4364DDEE6BB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A4AFD3E-D8D4-4837-B1BD-4D57D0F34DE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A4AFD3E-D8D4-4837-B1BD-4D57D0F34DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A4AFD3E-D8D4-4837-B1BD-4D57D0F34DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A4AFD3E-D8D4-4837-B1BD-4D57D0F34DE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
