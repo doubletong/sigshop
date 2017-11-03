@@ -488,5 +488,9 @@ namespace SIG.Repository
         /// </summary>
         /// <param name="entities">The entities.</param>
         public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
+        public virtual IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> expression)
+        {
+            return _dbSet.Where(expression);
+        }
     }
 }

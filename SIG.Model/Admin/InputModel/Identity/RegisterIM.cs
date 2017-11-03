@@ -6,7 +6,7 @@ namespace SIG.Model.Admin.InputModel.Identity
 {
     public class RegisterIM
     {
-        //[Remote("IsUserNameUnique", "User", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "IsExist")]
+        [Remote("IsUserNameUnique", "Account", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "IsExist")]
         [Required(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "Required")]
         [Display(ResourceType = typeof(Labels), Name = "UserName")]
         public string UserName { get; set; }
@@ -29,7 +29,7 @@ namespace SIG.Model.Admin.InputModel.Identity
         [Compare("Password", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "ComparePassword")]
         public string ConfirmPassword { get; set; }
 
-        //[Remote("IsEmailUnique", "User", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "IsExist")]
+        [Remote("IsEmailUnique", "Account", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "IsExist")]
         [EmailAddress(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "EmailAddressInvalidFormat")]
         [Required(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "Required")]
         [Display(ResourceType = typeof(Labels), Name = "Email")]

@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "wwwroot/public/css/main.css",
+    "inputFile": "wwwroot/public/css/main.scss"
+  },
+  {
+    "outputFile": "wwwroot/plugins/toastr/toastr.css",
+    "inputFile": "wwwroot/plugins/toastr/toastr.scss"
+  }
+]

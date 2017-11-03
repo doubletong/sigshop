@@ -34,12 +34,12 @@ namespace SIG.Data.Entity
         public virtual DbSet<MenuCategory> MenuCategory { get; set; }
         public virtual DbSet<Role> Role { get; set; }
 
-        //public virtual DbSet<Log> Log { get; set; }
+        public virtual DbSet<Log> Log { get; set; }
         //public virtual DbSet<Email> Emails { get; set; }
         //public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
         //public virtual DbSet<EmailAccount> EmailAccounts { get; set; }
         //public virtual DbSet<Position> Positions { get; set; }
-        //public virtual DbSet<Carousel> Carousels { get; set; }
+        //public virtual DbSet<Carousel> Carousels { get; setjlm.lgb; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -51,6 +51,8 @@ namespace SIG.Data.Entity
             builder.ApplyConfiguration(new MenuMap());
             builder.ApplyConfiguration(new MenuCategoryMap());
             builder.ApplyConfiguration(new RoleMenuMap());
+
+            builder.ApplyConfiguration(new LogMap());
 
             builder.EnableAutoHistory(null);
             // Customize the ASP.NET Identity model and override the defaults if needed.

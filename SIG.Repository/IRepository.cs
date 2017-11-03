@@ -257,5 +257,7 @@ namespace SIG.Repository
         /// </summary>
         /// <param name="entities">The entities.</param>
         void Delete(IEnumerable<TEntity> entities);
+        IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> expression);
+
     }
 }

@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet" />    
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3">
+            <ul class="sidebar-menu">
+                <li class="header">权限管理</li>
+                <!-- Optionally, you can add icons to the links -->
+                <li class="active"><a href="#"><i class="fa fa-link"></i> <span>组织机构</span></a></li>
+                <li><a href="#"><i class="fa fa-link"></i> <span>角色管理</span></a></li>
+                <li><a href="#"><i class="fa fa-link"></i> <span>用户管理</span></a></li>
+                <li><a href="#"><i class="fa fa-link"></i> <span>功能管理</span></a></li>
+                <li><a href="#"><i class="fa fa-link"></i> <span>权限管理</span></a></li>
+                <li><a href="#"><i class="fa fa-link"></i> <span>日志管理</span></a></li>
+                @*<li class="treeview">
+         <a href="#">
+             <i class="fa fa-link"></i> <span>Multilevel</span>
+             <span class="pull-right-container">
+                 <i class="fa fa-angle-left pull-right"></i>
+             </span>
+         </a>
+         <ul class="treeview-menu">
+             <li><a href="#">Link in level 2</a></li>
+             <li><a href="#">Link in level 2</a></li>
+         </ul>
+     </li>*@
+            </ul>
+        </div>
+        <div class="col-sm-9">
+            @RenderBody()
+        </div>
+    </div>
+
+
+    <hr/>
+    <footer>
+        @*@if (Context.User.Identity.IsAuthenticated)
+        {
+            <p>
+                @Context.User.Identity.Name (<a asp-controller="Security" asp-action="Logout">Logout</a>)
+            </p>
+        }
+        else
+        {
+            <p>
+                <a asp-controller="Security" asp-action="Login">Signin</a>
+                |
+                <a asp-controller="Security" asp-action="Register">Register</a>
+                |
+                <a asp-controller="Security" asp-action="ForgotPassword">Forgot Password</a>
+            </p>
+        }*@
+    </footer>
+</div>
+    <script src="~/js/lib/jquery/jquery.slim.min.js"></script>
+    <script src="~/js/lib/popper/popper.min.js"></script>
+    <script src="~/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

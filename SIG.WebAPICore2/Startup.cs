@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -35,19 +37,59 @@ namespace SIG.WebAPICore2
                         b => b.MigrationsAssembly("SIG.WebAPICore2")))
                 .AddUnitOfWork<SIGDbContext>();
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(options =>
-            {
-                options.LoginPath = new PathString("/Account/LogIn");
-                options.LogoutPath = new PathString("/Account/LogOff");
-                options.AccessDeniedPath = new PathString("/Error/Forbidden");
-            });
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            //{
+            //    options.LoginPath = new PathString("/Account/LogIn");
+            //    options.LogoutPath = new PathString("/Account/LogOff");
+            //    options.AccessDeniedPath = new PathString("/Error/Forbidden");
+            //});
 
-            services.AddDistributedMemoryCache();
-            services.AddSession();
+            services.AddAuthentication("FiverSecurityScheme")
+                   .AddCookie("FiverSecurityScheme", options =>
+                   {
+                       options.AccessDeniedPath = new PathString("/Security/Access");
+                       options.Cookie = new CookieBuilder
+                       {
+                            //Domain = "",
+                            HttpOnly = true,
+                           Name = ".Fiver.Security.Cookie",
+                           Path = "/",
+                           SameSite = SameSiteMode.Lax,
+                           SecurePolicy = CookieSecurePolicy.SameAsRequest
+                       };
+                       options.Events = new CookieAuthenticationEvents
+                       {
+                           OnSignedIn = context =>
+                           {
+                               Console.WriteLine("{0} - {1}: {2}", DateTime.Now,
+                                 "OnSignedIn", context.Principal.Identity.Name);
+                               return Task.CompletedTask;
+                           },
+                           OnSigningOut = context =>
+                           {
+                               Console.WriteLine("{0} - {1}: {2}", DateTime.Now,
+                                 "OnSigningOut", context.HttpContext.User.Identity.Name);
+                               return Task.CompletedTask;
+                           },
+                           OnValidatePrincipal = context =>
+                           {
+                               Console.WriteLine("{0} - {1}: {2}", DateTime.Now,
+                                 "OnValidatePrincipal", context.Principal.Identity.Name);
+                               return Task.CompletedTask;
+                           }
+                       };
+                        //options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+                        options.LoginPath = new PathString("/Security/Login");
+                       options.ReturnUrlParameter = "RequestPath";
+                       options.SlidingExpiration = true;
+                   });
+
+            //services.AddDistributedMemoryCache();
+            //services.AddSession();
 
             // 不允许匿名访问
             services.AddMvc(options =>
@@ -104,13 +146,13 @@ namespace SIG.WebAPICore2
                 });
             }
 
-            app.UseSession();
+            //app.UseSession();
           
-            DefaultFilesOptions options = new DefaultFilesOptions();
-            options.DefaultFileNames.Clear();
-            options.DefaultFileNames.Add("index.html");
-            app.UseDefaultFiles(options);
-            app.UseStaticFiles();
+            //DefaultFilesOptions options = new DefaultFilesOptions();
+            //options.DefaultFileNames.Clear();
+            //options.DefaultFileNames.Add("index.html");
+            //app.UseDefaultFiles(options);
+            //app.UseStaticFiles();
 
             //MVC 页面错误跳转带状态
             //app.UseStatusCodePagesWithReExecute("/Errors/Index", "?statusCode={0}");

@@ -61,58 +61,23 @@ namespace SIG.WebAPICore2.Controllers
             if (result == 1)
             {
                 AR.Setfailure(Messages.CannotRegisterEmail);
+                _logger.LogError(Messages.CannotRegisterEmail);
                 return Json(AR);
             }
 
             if (result == 2)
             {
                 AR.Setfailure(Messages.CannotRegisterUserName);
+                _logger.LogError(Messages.CannotRegisterUserName);
                 return Json(AR);
             }
 
 
             AR.SetSuccess(string.Format(Messages.AlertCreateSuccess, model.UserName));
+            _logger.LogError(string.Format(Messages.AlertCreateSuccess, model.UserName));
             return Json(AR);
         }
-
-
-        //protected int CreateUser(string userName, string email, string password, string realName)
-        //{
-        //    var orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u=>u,u => u.Email == email);
-        //    if (orgUsers!=null)
-        //    {
-        //        return 1; //1 邮箱已存在
-        //    }
-
-        //    orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u => u, u => u.UserName == userName);
-        //    if (orgUsers !=null)
-        //    {
-        //        return 2; //1 用户名已存在
-        //    }
-
-
-        //    var securityStamp = Hash.GenerateSalt();
-        //    var passwordHash = Hash.HashPasswordWithSalt(password, securityStamp);
-
-        //    var newUser = new User()
-        //    {
-        //        UserName = userName,
-        //        RealName = realName,
-        //        Email = email,
-        //        SecurityStamp = Convert.ToBase64String(securityStamp),
-        //        PasswordHash = passwordHash,
-        //        CreateDate = DateTime.Now,
-        //        IsActive = true
-        //    };
-
-        //    _logger.LogInformation(string.Format(Logs.CreateMessage, EntityNames.User, userName));
-        //    _unitOfWork.GetRepository<User>().Insert(newUser);
-        //    _unitOfWork.SaveChanges();
-        //    // SetUserCookies(false, newUser);
-
-        //    return 0;
-
-        //}
+        
 
         public IActionResult Login(string returnUrl = null)
         {
@@ -136,27 +101,45 @@ namespace SIG.WebAPICore2.Controllers
             {
                 return BadRequest(badUserNameOrPasswordMessage);
             }
-            var lookupUser = _unitOfWork.GetRepository<User>().GetFirstOrDefault<User>(d=>d, d => d.UserName == user.UserName);
+
+            var lookupUser = _userServices.SignIn(user.UserName, user.Password);
+            
                 //Users.FirstOrDefault(u => u.UserName == user.UserName);
 
-            if (lookupUser?.PasswordHash != user.Password)
+            if (lookupUser==null)
             {
-                return BadRequest(badUserNameOrPasswordMessage);
+                ModelState.AddModelError(string.Empty, "无效的用户名或密码！");
+               // return BadRequest(badUserNameOrPasswordMessage);
+                return View(user);
             }
-          
-            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaim(new Claim(ClaimTypes.Name, lookupUser.UserName));
-            //add a list of roles
-            //foreach (Role r in someList.Roles)
-            //{
-            //    identity.AddClaim(new Claim(ClaimTypes.Role, r.Name));
-            //}
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties
+            // create claims
+            List<Claim> claims = new List<Claim>
             {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.Now.Add((TimeSpan.FromDays(180)))
-            });
+                new Claim(ClaimTypes.Name, lookupUser.UserName),
+                new Claim(ClaimTypes.Email, lookupUser.Email)
+            };
+
+            // create identity
+            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+           // var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+           // identity.AddClaim(new Claim(ClaimTypes.Name, lookupUser.UserName));
+            //add a list of roles
+            if (lookupUser.UserRoles!=null)
+            {
+                var roles = lookupUser.UserRoles.Select(u => u.Role);
+
+                foreach (Role r in roles)
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, r.RoleName));
+                }
+            }
+
+            // create principal
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             if (returnUrl == null)
             {
@@ -178,7 +161,31 @@ namespace SIG.WebAPICore2.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-      
-        
+        public JsonResult IsUserNameUnique(string UserName)
+        {
+            var result = _userServices.IsExistUserName(UserName);
+
+            return result
+                ? Json(false)
+                : Json(true);
+        }
+
+        public JsonResult IsEmailUnique(string Email)
+        {
+            var result = _userServices.IsExistEmail(Email);
+
+            return result
+                ? Json(false)
+                : Json(true);
+        }
+        public JsonResult IsEmailUniqueAtEdit(string email, Guid id)
+        {
+            var result = _userServices.IsExistEmail(email, id);
+
+            return result
+                ? Json(false)
+                : Json(true);
+        }
+
     }
 }

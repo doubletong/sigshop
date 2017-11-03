@@ -22,6 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\Security\Access.cshtml" />
+    <None Include="Views\Security\Login.cshtml" />
     <None Include="wwwroot\AdminVue\index.html" />
     <None Include="wwwroot\bootstrap\css\bootstrap-grid.css.map" />
     <None Include="wwwroot\bootstrap\css\bootstrap-grid.min.css.map" />

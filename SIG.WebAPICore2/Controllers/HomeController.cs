@@ -18,14 +18,19 @@ namespace SIG.WebAPICore2.Controllers
         {
             this._logger = logger;
         }
+        [Authorize]
         public IActionResult Index()
         {
-            GlobalDiagnosticsContext.Set("CreatedBy", "doubletong");
-            _logger.LogCritical("nlog is working from a controller");         
+            var userName = User.Identity.Name;
+            TempData["UserName"] = userName;
+
+            //GlobalDiagnosticsContext.Set("CreatedBy", "doubletong");
+            //_logger.LogCritical("nlog is working from a controller");         
           
             return View();
         }
-        [Authorize]
+     
+       
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";

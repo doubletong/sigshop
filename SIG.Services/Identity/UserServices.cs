@@ -14,16 +14,27 @@ namespace SIG.Services.Identity
         {
             _unitOfWork = unitOfWork;
         }
+
+        public User SignIn(string username, string password)
+        {
+            var user = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u=>u,u=>u.UserName == username );
+            if (user == null) return null;
+
+            var salt = Convert.FromBase64String(user.SecurityStamp);
+            var pwdHash = Hash.HashPasswordWithSalt(password, salt);
+
+            return user.PasswordHash == pwdHash ? user : null;
+          
+        }
         public int CreateUser(string userName, string email, string password, string realName)
         {
-            var orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u => u, u => u.Email == email);
-            if (orgUsers != null)
+            
+            if (IsExistEmail(email))
             {
                 return 1; //1 邮箱已存在
             }
-
-            orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u => u, u => u.UserName == userName);
-            if (orgUsers != null)
+           
+            if (IsExistUserName(userName))
             {
                 return 2; //1 用户名已存在
             }
@@ -51,5 +62,23 @@ namespace SIG.Services.Identity
             return 0;
 
         }
+
+        public bool IsExistEmail(string email)
+        {
+           var result = _unitOfWork.GetRepository<User>().Count(u => u.Email == email);  
+           return result > 0;
+        }
+        public bool IsExistEmail(string email, Guid id)
+        {
+            var result = _unitOfWork.GetRepository<User>().Count(u => u.Email == email && u.Id!=id);
+            return result > 0;
+        }
+
+        public bool IsExistUserName(string userName)
+        {
+            var result = _unitOfWork.GetRepository<User>().Count(u => u.UserName == userName);
+            return result > 0;
+        }
+
     }
 }
