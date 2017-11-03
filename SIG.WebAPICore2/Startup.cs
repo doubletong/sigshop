@@ -14,6 +14,7 @@ using NLog.Web;
 using SIG.Data.Entity;
 using SIG.Repository;
 using Swashbuckle.AspNetCore.Swagger;
+using SIG.Services.Identity;
 
 namespace SIG.WebAPICore2
 {
@@ -66,7 +67,7 @@ namespace SIG.WebAPICore2
             });
 
             // Add application services. 依赖注入
-            //services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<IUserServices, UserServices>();
             //services.AddTransient<ISmsSender, AuthMessageSender>();
         }
 

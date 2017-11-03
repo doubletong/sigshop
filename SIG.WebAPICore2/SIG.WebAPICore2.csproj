@@ -59,6 +59,7 @@
     <ProjectReference Include="..\SIG.Infrastructure\SIG.Infrastructure.csproj" />
     <ProjectReference Include="..\SIG.Model\SIG.Model.csproj" />
     <ProjectReference Include="..\SIG.Repository\SIG.Repository.csproj" />
+    <ProjectReference Include="..\SIG.Services\SIG.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

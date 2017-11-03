@@ -15,6 +15,7 @@ using SIG.Model.Admin.InputModel.Identity;
 using SIG.Model.Admin.ViewModel;
 using SIG.Repository;
 using SIG.Resources.Admin;
+using SIG.Services.Identity;
 
 namespace SIG.WebAPICore2.Controllers
 {
@@ -22,9 +23,11 @@ namespace SIG.WebAPICore2.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<AccountController> _logger;
-        public AccountController(IUnitOfWork unitOfWork, ILogger<AccountController> logger)
+        private readonly IUserServices _userServices;
+        public AccountController(IUnitOfWork unitOfWork, IUserServices userServices, ILogger<AccountController> logger)
         {
             _unitOfWork = unitOfWork;
+            _userServices = userServices;
             _logger = logger;
 
            
@@ -53,7 +56,7 @@ namespace SIG.WebAPICore2.Controllers
             }
 
 
-            var result = CreateUser(model.UserName, model.Email, model.Password, model.DisplayName);
+            var result = _userServices.CreateUser(model.UserName, model.Email, model.Password, model.DisplayName);
 
             if (result == 1)
             {
@@ -73,43 +76,43 @@ namespace SIG.WebAPICore2.Controllers
         }
 
 
-        protected int CreateUser(string userName, string email, string password, string realName)
-        {
-            var orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u=>u,u => u.Email == email);
-            if (orgUsers!=null)
-            {
-                return 1; //1 邮箱已存在
-            }
+        //protected int CreateUser(string userName, string email, string password, string realName)
+        //{
+        //    var orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u=>u,u => u.Email == email);
+        //    if (orgUsers!=null)
+        //    {
+        //        return 1; //1 邮箱已存在
+        //    }
 
-            orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u => u, u => u.UserName == userName);
-            if (orgUsers !=null)
-            {
-                return 2; //1 用户名已存在
-            }
+        //    orgUsers = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u => u, u => u.UserName == userName);
+        //    if (orgUsers !=null)
+        //    {
+        //        return 2; //1 用户名已存在
+        //    }
 
 
-            var securityStamp = Hash.GenerateSalt();
-            var passwordHash = Hash.HashPasswordWithSalt(password, securityStamp);
+        //    var securityStamp = Hash.GenerateSalt();
+        //    var passwordHash = Hash.HashPasswordWithSalt(password, securityStamp);
 
-            var newUser = new User()
-            {
-                UserName = userName,
-                RealName = realName,
-                Email = email,
-                SecurityStamp = Convert.ToBase64String(securityStamp),
-                PasswordHash = passwordHash,
-                CreateDate = DateTime.Now,
-                IsActive = true
-            };
+        //    var newUser = new User()
+        //    {
+        //        UserName = userName,
+        //        RealName = realName,
+        //        Email = email,
+        //        SecurityStamp = Convert.ToBase64String(securityStamp),
+        //        PasswordHash = passwordHash,
+        //        CreateDate = DateTime.Now,
+        //        IsActive = true
+        //    };
 
-            _logger.LogInformation(string.Format(Logs.CreateMessage, EntityNames.User, userName));
-            _unitOfWork.GetRepository<User>().Insert(newUser);
-            _unitOfWork.SaveChanges();
-            // SetUserCookies(false, newUser);
+        //    _logger.LogInformation(string.Format(Logs.CreateMessage, EntityNames.User, userName));
+        //    _unitOfWork.GetRepository<User>().Insert(newUser);
+        //    _unitOfWork.SaveChanges();
+        //    // SetUserCookies(false, newUser);
 
-            return 0;
+        //    return 0;
 
-        }
+        //}
 
         public IActionResult Login(string returnUrl = null)
         {
