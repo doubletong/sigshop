@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewData["Title"] = "About";
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <li><a asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
+}
+else
+{
+    <li><a asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
+}
+<h2>About</h2>
+
