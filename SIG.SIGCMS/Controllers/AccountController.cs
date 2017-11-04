@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SIG.Data.Entity.Identity;
 using SIG.Model.Admin.InputModel.Identity;
-using SIG.Model.Admin.ViewModel;
+using SIG.Model.Front.ViewModel;
 using SIG.Repository;
 using SIG.Resources.Front;
 using SIG.Services.Identity;
@@ -79,7 +79,7 @@ namespace SIG.SIGCMS.Controllers
 
             };
          
-            return View();
+            return View(im);
         }
 
         [HttpPost]

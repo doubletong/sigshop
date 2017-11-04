@@ -1,0 +1,272 @@
+﻿@model SIG.Model.Admin.ViewModel.Log.LogSearchVM
+@{
+    ViewBag.PageTitle = "系统日志";
+    ViewBag.Title = ViewBag.PageTitle + "_安全"; 
+}
+
+
+    <div class="row" style="margin-bottom: 1rem;">
+        <div class="col">
+            <form asp-controller="Log" asp-action="Index" method="get">
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                        <label class="sr-only" asp-for="StartDate"></label>
+                        <input type="date" class="form-control mb-2 mb-sm-0" asp-for="StartDate">
+                    </div>
+                    <div class="col-auto">
+                        <label class="sr-only" asp-for="ExpireDate"></label>
+                        <input type="date" class="form-control mb-2 mb-sm-0" asp-for="ExpireDate">
+                    </div>
+                    <div class="col-auto">
+                        <label class="sr-only" asp-for="Level"></label>
+                  
+                        <select class="form-control mb-2 mb-sm-0" asp-for="Level" asp-items="@Model.LevelItems">
+                            <option value="">等级</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary"><span class="fa fa-search fa-fw"></span>搜索</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-auto">
+            <button class="btn btn-danger delete-link pull-right" type="button" data-url="@Url.Action("Delete", new {Id = "all"})"><span class="fa fa-trash"></span> 清空日志</button>
+        </div>
+       
+    </div>
+
+
+
+
+<table class="table table-striped table-responsive-sm">
+   
+    <thead class="thead-dark">
+
+    <tr>
+        <th>
+            时间
+        </th>
+        <th>
+            等级
+        </th>
+        <th>
+            消息
+        </th>
+        <th>
+            用户名
+        </th>
+        <th>
+            日志记录器
+        </th>
+        <th>
+            调用点地址
+        </th>
+      
+        <th>
+            错误
+        </th>
+        
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Logs.Items)
+    {
+        <tr class="item-container" id="@string.Format("container{0}", item.Id)">
+            <td>
+                @Html.DisplayFor(modelItem => item.Logged)
+            </td>
+
+            <td>
+                <div style="width: 100px;">@Html.DisplayFor(modelItem => item.Level)</div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Message)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                <div style="width: 150px; word-break:break-all">@Html.DisplayFor(modelItem => item.Logger)</div>
+</td>
+
+            <td>
+                <div style="width: 350px; word-break:break-all">@Html.DisplayFor(modelItem => item.Callsite)</div>
+</td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Exception)
+            </td>
+           
+            <td>
+                @*@Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+                                @Html.ActionLink("Details", "Details", new { id=item.Id},new{@class="btn btn-primary"}) |*@
+                @*@Html.ActionLink("Delete", "Delete", new { id=item.Id }, new{@class="btn btn-danger"})*@
+
+                <button data-url="@Url.Action("Delete", new {Id = item.Id})" class="btn btn-xs btn-danger delete-item" type="button"><span class="fa fa-trash"></span></button>
+            </td>
+        </tr>
+
+    }
+    </tbody>
+</table>
+
+     
+
+<nav aria-label="...">
+    <ul class="pagination">
+        @{
+            int starIndex = 1, endIndex = Model.Logs.PageIndex + 5, totalPages = Model.Logs.TotalPages, currentIndex = Model.Logs.PageIndex;
+            if (Model.Logs.PageIndex - 5 >= 0)
+            {
+                starIndex = currentIndex - 4;
+                if (totalPages - 10 > 0 && totalPages - currentIndex < 5)
+                {
+                    starIndex = totalPages - 9;
+                }
+            }
+
+            if (totalPages - (currentIndex + 1) < 5)
+            {
+                endIndex = totalPages;
+            }
+            else
+            {
+                if (currentIndex < 6 && totalPages >10)
+                {
+                    endIndex = 10;
+                }
+            }
+
+        }
+        @if (!Model.Logs.HasPreviousPage)
+        {
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">前页</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <a class="page-link" asp-controller="Log"
+                   asp-action="Index"
+                   asp-route-page="@(currentIndex - 1)" asp-route-startDate="@Model.StartDate" asp-route-expireDate="@Model.ExpireDate" asp-route-level="@Model.Level" tabindex="-1">前页</a>
+            </li>
+        }
+
+
+        @for (var i = starIndex; i <= endIndex; i++)
+        {
+
+            if (Model.Logs.PageIndex == (i - 1))
+            {
+                <li class="page-item active">
+                    <a class="page-link" asp-controller="Log" asp-action="Index"
+                       asp-route-page="@i" asp-route-startDate="@Model.StartDate" asp-route-expireDate="@Model.ExpireDate" asp-route-level="@Model.Level">@i <span class="sr-only">(current)</span></a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Log" asp-action="Index"
+                       asp-route-page="@i" asp-route-startDate="@Model.StartDate" asp-route-expireDate="@Model.ExpireDate" asp-route-level="@Model.Level">@i</a>
+                </li>
+            }
+
+        }
+
+        @if (!Model.Logs.HasNextPage)
+        {
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">后页</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <a class="page-link" asp-controller="Log"
+                   asp-action="Index"
+                   asp-route-page="@(currentIndex + 1)" asp-route-startDate="@Model.StartDate" asp-route-expireDate="@Model.ExpireDate" asp-route-level="@Model.Level" tabindex="-1">后页</a>
+            </li>
+        }
+
+    </ul>
+</nav>
+
+
+
+@section footer {
+
+    <script>
+
+        $(function () {
+
+            //delete
+            $(document).on("click", '.delete-item', function (e) {
+                e.preventDefault();
+
+                var url = $(this).attr('data-url');
+                var that = $(this);
+                bootbox.setLocale("zh_CN");
+                bootbox.confirm("你确定要删除此项吗？", function (result) {
+                    if (result) {
+                        /*DELETE*/
+                        var title = "删除日志";
+                        Common.DeleteItem(url, title, that);
+                    }
+                });
+
+            });
+
+            //删除数据
+            $('.delete-link').click(function (e) {
+                var url = $(this).attr('data-url');
+                var that = $(this);
+                var title = "删除日志";
+
+                console.log(url);
+                /*DELETE*/
+                $.ajax({
+                    url: url,
+                    dataType: "json",
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({}),
+                    async: true,
+                    processData: false,
+                    cache: false,
+                    success: function (data) {
+
+                        switch (data.status) {
+                            case 2:
+                                toastr.error(data.message, title);
+                                break;
+                            case 3:
+                                toastr.info(data.message, title);
+                                break;
+                            case 4:
+                                toastr.warning(data.message, title);
+                                break;
+                            case 1:
+                                toastr.success(data.message, title);
+                                setTimeout(function() {
+                                        location.reload();
+                                    },
+                                    2000);
+                        }
+
+
+                    },
+                    error: function (xhr) {
+                        toastr.error('日志删除失败！', '删除日志');
+                    }
+                });
+
+
+                e.preventDefault();
+            });
+
+        });
+    </script>
+}

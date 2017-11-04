@@ -175,14 +175,7 @@ namespace SIG.Repository
                 query = query.Where(predicate);
             }
 
-            if (orderBy != null)
-            {
-                return orderBy(query).Select(selector).ToPagedList(pageIndex, pageSize);
-            }
-            else
-            {
-                return query.Select(selector).ToPagedList(pageIndex, pageSize);
-            }
+            return orderBy != null ? orderBy(query).Select(selector).ToPagedList(pageIndex, pageSize) : query.Select(selector).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -266,14 +259,7 @@ namespace SIG.Repository
                 query = query.Where(predicate);
             }
 
-            if (orderBy != null)
-            {
-                return orderBy(query).FirstOrDefault();
-            }
-            else
-            {
-                return query.FirstOrDefault();
-            }
+            return orderBy != null ? orderBy(query).FirstOrDefault() : query.FirstOrDefault();
         }
 
         /// <summary>
@@ -308,14 +294,7 @@ namespace SIG.Repository
                 query = query.Where(predicate);
             }
 
-            if (orderBy != null)
-            {
-                return orderBy(query).Select(selector).FirstOrDefault();
-            }
-            else
-            {
-                return query.Select(selector).FirstOrDefault();
-            }
+            return orderBy != null ? orderBy(query).Select(selector).FirstOrDefault() : query.Select(selector).FirstOrDefault();
         }
 
         /// <summary>
@@ -458,9 +437,13 @@ namespace SIG.Repository
         public void Delete(object id)
         {
             // using a stub entity to mark for deletion
+            
             var typeInfo = typeof(TEntity).GetTypeInfo();
-            var key = _dbContext.Model.FindEntityType(typeInfo.Name).FindPrimaryKey().Properties.FirstOrDefault();
-            var property = typeInfo.GetProperty(key?.Name);
+            var entityType = _dbContext.Model.FindEntityType(typeof(TEntity));
+            var key = entityType.FindPrimaryKey();
+            var iproperty = key?.Properties.FirstOrDefault();
+            // var key = _dbContext.Model.FindEntityType(typeInfo.Name).FindPrimaryKey().Properties.FirstOrDefault();
+            var property = typeInfo.GetProperty(iproperty?.Name);
             if (property != null)
             {
                 var entity = Activator.CreateInstance<TEntity>();
@@ -488,9 +471,16 @@ namespace SIG.Repository
         /// </summary>
         /// <param name="entities">The entities.</param>
         public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
-        public virtual IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> expression)
+
+        public IEnumerable<TEntity> GetAll()
+        {
+            return _dbSet;
+        }
+        public IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> expression)
         {
             return _dbSet.Where(expression);
         }
+
+
     }
 }

@@ -16,6 +16,8 @@ using NLog.Web;
 using SIG.Data.Entity;
 using SIG.Repository;
 using SIG.Services.Identity;
+using AutoMapper;
+using SIG.Services.Log;
 
 namespace SIG.SIGCMS
 {
@@ -46,10 +48,13 @@ namespace SIG.SIGCMS
                 options.AccessDeniedPath = new PathString("/Error/Login");
             });
 
+            services.AddMemoryCache();
             services.AddMvc();
-
+            services.AddAutoMapper();
+     
             // Add application services. 依赖注入
             services.AddTransient<IUserServices, UserServices>();
+            services.AddTransient<ILogServices, LogServices>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

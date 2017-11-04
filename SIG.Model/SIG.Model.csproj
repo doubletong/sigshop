@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SIG.Data\SIG.Data.csproj" />
+    <ProjectReference Include="..\SIG.Repository\SIG.Repository.csproj" />
     <ProjectReference Include="..\SIG.Resources\SIG.Resources.csproj" />
   </ItemGroup>
 

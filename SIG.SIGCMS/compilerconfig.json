@@ -6,5 +6,9 @@
   {
     "outputFile": "wwwroot/plugins/toastr/toastr.css",
     "inputFile": "wwwroot/plugins/toastr/toastr.scss"
+  },
+  {
+    "outputFile": "wwwroot/admin/css/Style.css",
+    "inputFile": "wwwroot/admin/css/Style.less"
   }
 ]

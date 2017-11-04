@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
@@ -34,8 +36,18 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="wwwroot\admin\" />
     <Folder Include="wwwroot\public\img\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\CKFinder.Net.csproj" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\CKFinder.Net.sln" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\Resources\Plugins\FileEditor\FileEditor.csproj" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\Resources\Plugins\FileEditor\FileEditor.sln" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\Resources\Plugins\ImageResize\ImageResize.csproj" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\Resources\Plugins\ImageResize\ImageResize.sln" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\Resources\Plugins\Watermark\Watermark.csproj" />
+    <None Include="wwwroot\admin\Plugins\ckfinder\_source\Resources\Plugins\Watermark\Watermark.sln" />
   </ItemGroup>
 
 </Project>
