@@ -140,7 +140,6 @@ namespace SIG.SIGCMS.Controllers
         {
             await HttpContext.SignOutAsync(
                 scheme: CookieAuthenticationDefaults.AuthenticationScheme);
-
             return RedirectToAction("Login");
         }
 

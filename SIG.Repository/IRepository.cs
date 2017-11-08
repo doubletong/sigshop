@@ -259,7 +259,11 @@ namespace SIG.Repository
         void Delete(IEnumerable<TEntity> entities);
 
         IEnumerable<TEntity> GetAll();
-        IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> expression);
+
+        IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            bool disableTracking = true);
 
     }
 }

@@ -1,0 +1,29 @@
+﻿.toolbar {
+  padding: 0 10px 0 0;
+  background-color: #eeeeee;
+  height: 36px;
+  line-height: 36px;
+}
+.toolbar a.showmenu {
+  color: #555555;
+  display: block;
+  height: 36px;
+  width: 36px;
+  text-align: center;
+  background-color: #ddd;
+  float: left;
+
+}
+.toolbar a.showmenu:hover {
+  background-color: #ccc;
+  color: #333333;
+}
+.toolbar .breadcrumb {
+  margin: 0 0 0 45px;
+  padding: 0;
+  background-color: transparent;
+}
+.toolbar .breadcrumb a {
+  color: #555555;
+}
+

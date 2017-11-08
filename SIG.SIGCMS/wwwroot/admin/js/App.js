@@ -1,11 +1,14 @@
 ﻿$(function () {
 
-
-
     var resetwidth = function () {
 
         var winheight = $(window).height(), winwidth = $(window).width();
-        $('#rightcol').css({ 'min-height': (winheight - 59) + "px" })
+
+        var height = Math.max($("#sidebar-nav").height(), $("#rightcol").height(), winheight);
+        //  $("#sidebar-nav").height(height);
+        //  $("#rightcol").height(height);
+
+        $('#rightcol,#sidebar-nav').css({ 'min-height': height + "px" })
         if (winwidth <= 768) {
             $('#rightcol').css({ 'width': winwidth + "px" })
         } else {
@@ -19,24 +22,29 @@
         resetwidth();
     });
 
+    var pid = $('.mainmenu a.active').closest('li').attr("data-parent");
+    $('.mainmenu li[data-parent=' + pid + ']').fadeIn();
+
+    //查子项数量
+    $.each($(".down-nav>a"), function (index, value) {
+        var id = $(value).attr("data-id");
+        var licount = $('.mainmenu li[data-parent=' + id + ']').length;
+        var html = '<span class="badge badge-pill badge-secondary">' + licount + '</span>';
+        $(value).append(html);
+    });
+
     $(".down-nav>a").click(function (e) {
         e.preventDefault();
-        var n = $(this).next("ul");
+
+        var id = $(this).attr("data-id");
+        $('.mainmenu li[data-parent=' + id + ']').slideToggle();
+
+        //var n = $(this).next("ul");
         var li = $(this).closest('li');
-        n.slideToggle();
+        //n.slideToggle();
 
-        if (li.hasClass('nav-open')) {
-            li.removeClass('nav-open');
-        }
-        else {
-            // n.slideDown();
-            //var newH = n.css('height', 'auto').height();         
-            //n.height(0).animate({ height:newH }, 300);
-            setTimeout(function () {
-                li.addClass('nav-open');
-            }, 300);
+        li.toggleClass('nav-open');
 
-        }
     });
 
 
@@ -124,17 +132,17 @@ var Common = {
 
         switch (data.status) {
             case 1:
-                toastr.success(data.message, title)
-                func(data.Id, data.Data);
+                toastr.success(data.message, title);
+                func(data.id, data.data);
                 break;
             case 2:
-                toastr.error(data.message, title)
+                toastr.error(data.message, title);
                 break;
             case 3:
-                toastr.info(data.message, title)
+                toastr.info(data.message, title);
                 break;
             case 4:
-                toastr.warning(data.message, title)
+                toastr.warning(data.message, title);
         }
     },
     SubmitBack: function (data, title, container) {

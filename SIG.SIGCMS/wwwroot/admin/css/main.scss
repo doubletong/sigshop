@@ -1,0 +1,74 @@
+﻿@import "_variables.scss";
+@import "_common.scss";
+@import "_loading.scss";
+@import "_layout.scss";
+@import "_breadcrumb.scss";
+@import "_nav.scss";
+@import "_box.scss";
+@import "_tree.scss";
+@import "_customBootstrap.scss";
+@import "_table.scss";
+@import "_form.scss";
+
+
+
+html {
+ 
+}
+
+body {
+    background: #333;
+   font-size:.875rem;
+    color: #666666;
+    font-family: "Microsoft YaHei", 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
+}
+
+a {
+    color: #006dd5;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #0099ff;
+}
+
+input,
+textarea,
+h3,
+h4 {
+    font-family: "Microsoft YaHei", 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
+}
+
+
+.form-control.input-validation-error {
+    border: #d9534f 1px solid;
+    box-shadow: inset 0 1px 1px rgba(217, 83, 79, 0.15);
+}
+
+.field-validation-error {
+    color: #d9534f;
+    line-height: 34px;
+}
+
+
+.user-avater {
+    padding-top: 8px;
+    margin-right: 15px;
+
+    img{
+        height: 34px;
+    }
+}
+
+
+footer.page-footer {
+    text-align: center;
+    height: 35px;
+    line-height: 35px;
+    font-size: 11px;
+}
+
+.badge-primary {
+    background-color: $colorAssistant;
+    font-weight: normal;
+}

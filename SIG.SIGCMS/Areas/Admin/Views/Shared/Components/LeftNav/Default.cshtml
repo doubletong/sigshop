@@ -1,0 +1,54 @@
+﻿@using SIG.Infrastructure.Configs
+@using SIG.Model.Admin.ViewModel.Menus
+@model LeftNavVM
+
+@if (Model.Menus != null)
+{
+
+    <div id="sidebar-nav" class="leftcol">
+        <aside class="logo text-center">
+            <img src="@SettingsManager.Site.DashboardLogo" />
+        </aside>
+        <aside>
+            <nav id="menu">
+                <ul class="list-unstyled mainmenu">
+                    @foreach (var item in Model.Menus)
+                    {
+                    if (item.Active)
+                    {
+                        string url = string.IsNullOrEmpty(item.Url) ? "#" : item.Url;
+                        string hasChilds = string.IsNullOrEmpty(item.Url) ? "down-nav" : "";
+
+                        if (Model.CurrentMenu != null)
+                        {
+                            string linkActive = item.Id == Model.CurrentMenu.Id ? "active" : "";
+                            string openav = Model.CurrentMenu.ParentId == item.Id ? "nav-open" : "";
+
+                                <li class="@hasChilds @string.Format("level{0}", item.LayoutLevel) @openav" data-parent="@(item.ParentId??0)">
+                                    <a href="@url" class="@linkActive" data-id="@item.Id">
+                                        <i class="@item.Iconfont fa-fw"></i>@item.Title
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+
+                                <li class="@hasChilds @string.Format("level{0}", item.LayoutLevel)" data-parent="@(item.ParentId??0)">
+                                    <a href="@url" class="" data-id="@item.Id">
+                                        <i class="@item.Iconfont fa-fw"></i>@item.Title
+                                    </a>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+
+            </nav>
+
+            <div class="closemenu">
+                <a href="#"><i class="fa fa-chevron-circle-left"></i></a>
+            </div>
+        </aside>
+
+    </div>
+}

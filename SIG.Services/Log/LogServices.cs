@@ -20,9 +20,8 @@ namespace SIG.Services.Log
         public IPagedList<Data.Entity.Log> SearchLogs(int pageIndex, int pageSize, DateTime? startDate, DateTime? expireDate,
             string level, out int count)
         {
-            var logs = _unitOfWork.GetRepository<Data.Entity.Log>();
 
-            Expression<Func<Data.Entity.Log, bool>> expression = d=>d.Id>0;
+            Expression<Func<Data.Entity.Log, bool>> expression = d=>true;
 
             if (startDate != null)
             {
@@ -41,7 +40,6 @@ namespace SIG.Services.Log
 
             var result = _unitOfWork.GetRepository<Data.Entity.Log>().GetPagedList(predicate: expression, orderBy: d=>d.OrderBy(l=>l.Logged), pageIndex:pageIndex, pageSize:pageSize);
              
-             //   .Skip(pageIndex * pageSize).Take(pageSize).AsEnumerable();
 
             return result;
         }

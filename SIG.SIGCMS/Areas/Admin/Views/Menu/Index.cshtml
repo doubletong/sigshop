@@ -1,0 +1,250 @@
+﻿@using SIG.Data.Entity.Identity
+@using SIG.Resources.Admin
+@model MenuCategory
+@{
+    ViewBag.Title = EntityNames.Menu;
+    ViewBag.PageTitle = ViewBag.Title + "_组件";
+}
+
+
+    <div class="row">
+     
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <header class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-navicon"></i> @Model.Title
+                    </h3>
+                    <button type="button" class="btn btn-info btn-sm btn-refresh" data-id="@Model.Id" data-url="@Url.Action("resetSort",new { id=Model.Id})"><i class="fa fa-sort-numeric-asc"></i></button>
+                </header>
+                <section class="panel-body" id="@string.Format("menu{0}", Model.Id)">
+                    @*<a asp-controller="Menu" asp-action="CreateMenu" data-route-parentId="1" data-route-categoryId="1" data-ajax="true" data-ajax-method="GET"
+                       data-ajax-mode="replace" data-ajax-update="edit-container" data-ajax-begin="onBegin" data-ajax-complete="onComplete"
+                       data-ajax-failure="onFailed" data-ajax-success="onSuccess"><i class='fa fa-plus'></i></a>*@
+
+                    @await Component.InvokeAsync("MenuList", new {categoryId = Model.Id})
+                </section>
+                <footer class="panel-footer">
+                </footer>
+            </div>
+            </div>
+     
+    </div>
+
+<div id="edit-container">
+</div>
+
+<form id="anti-form" method="post">
+    @Html.AntiForgeryToken()
+</form>
+
+@section header{
+    <style>
+        .panel {
+            box-shadow: 0 0 1rem rgba(0, 0, 0, .15);
+            padding:0 2rem 2rem;
+        }
+        .panel-heading {
+            border-bottom: 1px #eee solid;
+            margin: 0 -2rem;position: relative;
+        }
+        .panel-title {
+            font-size: 1rem;padding: 1rem 1rem;margin: 0;
+        }
+        .btn-refresh {
+            position: absolute;right: 1rem;top: .6rem;z-index: 100;
+        }
+       
+        .panel-body {
+            padding-top: 1rem;
+        }
+        li a{
+            margin-left: .3rem;
+        }
+        
+    </style>
+}
+
+@section footer {
+    <script src="~/js/lib/jquery/plugins/jquery.validate.min.js"></script>
+    <script src="~/js/lib/jquery/plugins/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/lib/jquery/plugins/jquery.unobtrusive-ajax.min.js"></script>
+
+        <script>
+            function onBegin() {
+                //  $("#divLoading").removeClass("divhide").addClass("divShow");
+            }
+
+            function onComplete() {
+                $('#ModalMenuForm').modal();
+            }
+            function onSuccess(data) {
+                //console.log(data);
+                //$("#")
+            }
+            function onFailed(d) {
+
+            }
+
+
+            function onBeginSave() {
+                $("#btnSave i").removeClass("fa-save").addClass("fa-spinner fa-spin");
+            }
+            function onCompleteSave() {
+                $("#btnSave i").removeClass("fa-spinner fa-spin").addClass("fa-save");
+            }
+            function onSuccessSave(data) {
+                var title = '@ViewBag.PageTitle';
+                Common.ShowBoxWithFuncBack(data, title, submitSuccess);
+            }
+            function onFailedSave(d) {
+                toastr.error(d.message, '@ViewBag.Title');
+            }
+
+            function submitSuccess(id, htmlData) {
+               
+                $('#ModalMenuForm').modal('hide');
+                $("#menu" + id).html(htmlData);
+
+                $.ajax({
+                    method: 'GET',
+                    url: '@Url.Action("GetMenus", "Menu")?categoryId=' + id
+                }).done(function (data, statusText, xhdr) {
+                    $("#menu" + id).html(data);
+                    }).fail(function (xhdr, statusText, errorText) {
+                        toastr.error(JSON.stringify(xhdr), '@ViewBag.Title');
+                    //$("#result").text(JSON.stringify(xhdr));
+                });
+
+                //debugger;
+            }
+
+
+            $(function () {
+
+
+
+                //展开折叠菜单
+                $(document).on("click", '.expmenu', function (e) {
+              //  $(".expmenu").on("click", function (e) {
+                    e.preventDefault();
+
+                    if ($(this).hasClass("expandmenu")) {
+                        $(this).children("span").removeClass("fa-minus-circle").addClass("fa-plus-circle");
+                    } else {
+                        $(this).children("span").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+                    }
+
+                    $(this).toggleClass("expandmenu");
+                    $(this).closest("li").children("ul.menuTree").toggleClass("hidden");
+
+                    var url = $(this).attr("data-url");
+                    Common.SingleAction(url, "", false);
+
+                });
+
+
+                //delete
+                $(document).on("click", '.delete-item', function (e) {
+                    e.preventDefault();
+
+                    var url = $(this).attr('data-url');
+                    var that = $(this);
+                    bootbox.setLocale("zh_CN");
+                    bootbox.confirm("你确定要删除此项吗？", function (result) {
+                        if (result) {
+                            /*DELETE*/
+                            var title = "@ViewBag.Title";
+                            Common.DeleteItem(url, title, that);
+                        }
+                    });
+
+                });
+
+                //删除数据
+                $(document).on("click", '.menuRemove', function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    //      var confireMes = $(this).attr('data-confirm');
+                    var menu = "#menu" + $(this).attr('data-categoryid');
+                    var that = $(this);
+
+                    bootbox.setLocale("zh_CN");
+
+                    bootbox.confirm("是否确定删除该项？", function (result) {
+                        if (result) {
+                            $.post(url, $("#anti-form").serialize(), function (data) {
+
+                                if (data.Status === 1) {
+                                    toastr.error(data.message, '@ViewBag.Title');
+                                } else {
+                                    toastr.success("已成功删除此项", '@ViewBag.Title');
+
+                                    setTimeout(function () {
+                                        location.reload();
+                                    }, 1000);
+                                }
+
+                            });
+                        }
+                    });
+                });
+
+
+                //排序向上移动
+                $(document).on("click", ".moveMenu", function (e) {
+                    var url = $(this).attr('href');
+                    var categoryId = $(this).attr('data-categoryid');
+                    var that = $(this);
+                    var title = "排序";
+                    e.preventDefault();
+
+                    Common.SingleActionWithFuncBack(url, title, categoryId, resetSortSuccess);
+
+                    @*$.post(url, $("#anti-form").serialize(), function (data) {
+
+                        switch (data.Status) {
+                            case 2:
+                                toastr.error(data.Message, '@ViewBag.Title');
+                                break;
+                            case 3:
+                                toastr.info(data.Message, '@ViewBag.Title');
+                                break;
+                            case 1:
+                                toastr.success("已成功排位菜单", '@ViewBag.Title');
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                        }
+                    });*@
+                });
+
+                //激活
+                $('.active-item').click(function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('data-url'), title = $(this).attr('data-action'), that = $(this);
+
+                    Common.SingleAction(url, title, true);
+
+                });
+
+
+                $('.btn-refresh').click(function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('data-url'), title = '重排序列', that = $(this).attr("data-id");
+                    Common.SingleActionWithFuncBack(url, title, that, resetSortSuccess);
+                    //(url, title, that, func)
+                });
+
+
+
+
+
+            });
+
+            function resetSortSuccess(id,htmlData) {
+                $("#menu" + id).html(htmlData);
+            }
+        </script>
+
+    }

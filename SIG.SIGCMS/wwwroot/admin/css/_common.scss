@@ -1,0 +1,27 @@
+﻿.pointer{
+    cursor: pointer;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 5500s ease-in-out 0s;
+    -webkit-text-fill-color: #666 !important;
+    
+}
+.m-b-10 {
+    margin-bottom: 10px;
+}
+.m-b-15 {
+    margin-bottom: 15px;
+}
+.p-t-5{
+    padding-top:5px;
+}
+.p-t-8 {
+    padding-top: 5px;
+}
+.hidden{
+    display:none;
+}

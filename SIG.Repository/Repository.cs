@@ -476,11 +476,30 @@ namespace SIG.Repository
         {
             return _dbSet;
         }
-        public IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> expression)
+
+        public IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            bool disableTracking = true)
         {
-            return _dbSet.Where(expression);
+            IQueryable<TEntity> query = _dbSet;
+            if (disableTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            return orderBy != null ? orderBy(query) : query;
+
         }
-
-
     }
 }

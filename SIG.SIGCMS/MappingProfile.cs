@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using SIG.Data.Entity.Identity;
+using SIG.Model.Admin.InputModel.Menus;
 
 namespace SIG.SIGCMS
 {
@@ -11,8 +13,8 @@ namespace SIG.SIGCMS
         public MappingProfile()
         {
             // Add as many of these lines as you need to map your objects
-            //CreateMap<User, UserDto>();
-            //CreateMap<UserDto, User>();
+            CreateMap<Menu, MenuIM>();
+            CreateMap<MenuIM, Menu>();
         }
     }
 }

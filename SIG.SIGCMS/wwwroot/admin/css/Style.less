@@ -1,10 +1,12 @@
 ﻿@import "variables.less";
 @import "mixins.less";
+@import "_custombootstrap.css";
 
 body
 {
   background:#000 url(../img/mosaic_noise.gif);color:@mainColor;   
   font-family:@font-family-base;padding-top:56px;
+
 
 }
 a{
@@ -13,6 +15,7 @@ a{
         text-decoration: none;color:@hoverColor;
     }
 }
+
 
 .btn-action{
    padding:2px 6px;border-radius:2px;box-shadow:rgba(0,0,0,0.05) 0 -2px 3px inset;
@@ -175,68 +178,6 @@ nav#menu {
 
 
 
-.box
-{
-    background-color:#fff;
-   
-    .box-header
-    {
-        background-color:@navy-light;color:#fff;height:36px;position:relative;
-        h3{
-            margin:0;padding:0;line-height:36px;
-            .font-size(1.8);font-weight:normal;padding-left:8px;
-        }
-        .control{
-            position:absolute;height:36px;right:0;top:0;
-            a{
-                display:block;width:36px;height:36px;text-align:center;line-height:36px;float:left;
-                color:#fff;border-left:1px @navy-lighter solid;
-            }
-            a.compress{
-                display:none;
-            }
-        }
-    }
-    .box-body{
-        border:1px #ccc solid; border-top:none;border-bottom:none;
-        .box-toolbar{
-            padding:15px 15px;
-        }
-        .box-table{
-            border-top:1px #ddd solid; border-bottom:1px #ddd solid;margin:0;
-            th{
-                background-color:#f7f7f7;
-            }
-        }
-       
-
-    }
-     .box-footer{
-            padding:15px 15px 10px;
-             border:1px #ccc solid; border-top:none;
-            .pagination{
-                margin:0;
-            }
-            .table-pager{
-                @media only screen and (max-width : 768px){
-                  text-align:center;
-                }
-                .pagecount{
-                    text-align:right;
-                    @media only screen and (max-width : 768px){
-                      text-align:center;
-                    }
-                }
-            }
-        }
-}
-
-.box-fixed{
-    position:fixed;width:100%;height:100%;margin:0;z-index:5000;top:0;left:0;
-    overflow-y:scroll;
-    -webkit-overflow-scrolling: touch;
-    
-}
 
 .abtn{
     .actionbtn(@gray);
@@ -244,6 +185,8 @@ nav#menu {
 .abtn-primary{
     .actionbtn(@navy);
 }
+
+
 
 
 footer#pagefooter

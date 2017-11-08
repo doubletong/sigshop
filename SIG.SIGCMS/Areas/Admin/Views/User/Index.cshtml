@@ -1,0 +1,342 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using SIG.Model.Admin.ViewModel.Identity
+@using SIG.Resources.Admin
+@model UserListVM
+
+
+@{
+    var modelName = EntityNames.User;
+    ViewBag.PageTitle = modelName;
+    ViewBag.Title = ViewBag.PageTitle + "_安全";
+}
+
+@section header{
+
+ }
+
+            <div class="panel panel-default">
+                <header class="panel-heading">
+                    <a asp-controller="User" asp-action="Create" data-ajax = "true" data-ajax-method = "GET" data-ajax-mode = "replace" data-ajax-update="#edit-container"
+                       data-ajax-begin = "onBegin" data-ajax-complete = "onComplete" data-ajax-failure = "onFailed" data-ajax-success = "onSuccess" ><i class="fa fa-plus fa-fw"></i>创建新用户</a>
+               
+                    <form asp-controller="User" asp-action="Index" method="get">
+
+                        <div class="form-group">
+                            <label class="sr-only" for="Username">用户名</label>
+                            @Html.EditorFor(model => model.Keyword, new {htmlAttributes = new {@class = "form-control", placeholder = "用户名"}})
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="StartDate">开始日期</label>
+                            @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {@class = "form-control", placeholder = "开始日期"}})
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="EndDate">结束日期</label>
+                            @Html.EditorFor(model => model.EndDate, new {htmlAttributes = new {@class = "form-control", placeholder = "结束日期"}})
+                        </div>
+                        @Html.DropDownListFor(model => model.RoleId, (IEnumerable<SelectListItem>) ViewBag.Roles, string.Format("--{0}--", EntityNames.Role), new {@class = "form-control"})
+                        @*<div class="form-group">
+                @Html.DropDownList("DepartmentId", null, "--所属部门--", htmlAttributes: new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.DropDownList("PositionId", null, "--所在岗位--", htmlAttributes: new { @class = "form-control" })
+            </div>*@
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> 搜索</button>
+                    </form>
+
+                </header>
+          
+                <table class="table table-bordered table-striped table-vmiddle">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>头像</th>
+                        <th>
+                            用户名
+                        </th> 
+                        <th>
+                            邮箱
+                        </th> 
+                        <th>
+                            姓名
+                        </th>                           
+                        <th>
+                            手机
+                        </th>
+                                                 
+                        <th>
+                            激活？
+                        </th>
+                        <th>
+                            创建日期
+                        </th>                         
+                          
+                    </tr>
+                    </thead>
+                    <tbody id="tbList">
+                    @foreach (var item in Model.Users.Items)
+                    {
+                        Html.RenderPartial("_UserItem", item);
+                    }
+                    </tbody>                    
+                </table>
+                
+
+
+               
+                <div class="panel-footer">                   
+
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <nav>
+                                <ul class="pagination">
+                                    @{
+                                        int starIndex = 1, endIndex = Model.Users.PageIndex + 5, totalPages = Model.Users.TotalPages, currentIndex = Model.Users.PageIndex;
+                                        if (Model.Users.PageIndex - 5 >= 0)
+                                        {
+                                            starIndex = currentIndex - 4;
+                                            if (totalPages - 10 > 0 && totalPages - currentIndex < 5)
+                                            {
+                                                starIndex = totalPages - 9;
+                                            }
+                                        }
+
+                                        if (totalPages - (currentIndex + 1) < 5)
+                                        {
+                                            endIndex = totalPages;
+                                        }
+                                        else
+                                        {
+                                            if (currentIndex < 6 && totalPages > 10)
+                                            {
+                                                endIndex = 10;
+                                            }
+                                        }
+
+                                    }
+                                    @if (!Model.Users.HasPreviousPage)
+                                    {
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">前页</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+
+                                        <li class="page-item disabled">
+                                            <a class="page-link" asp-controller="Log"
+                                               asp-action="Index"
+                                               asp-route-page="@(currentIndex - 1)" asp-route-keyword="@Model.Keyword" asp-route-startDate="@Model.StartDate" asp-route-endDate="@Model.EndDate" asp-route-roleId="@Model.RoleId" tabindex="-1">前页</a>
+                                        </li>
+                                    }
+
+
+                                    @for (var i = starIndex; i <= endIndex; i++)
+                                    {
+
+                                        if (Model.Users.PageIndex == (i - 1))
+                                        {
+                                            <li class="page-item active">
+                                                <a class="page-link" asp-controller="Log" asp-action="Index"
+                                                   asp-route-page="@i" asp-route-keyword="@Model.Keyword" asp-route-startDate="@Model.StartDate" asp-route-endDate="@Model.EndDate" asp-route-roleId="@Model.RoleId">@i<span class="sr-only">(current)</span></a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-controller="Log" asp-action="Index"
+                                                   asp-route-page="@i" asp-route-keyword="@Model.Keyword" asp-route-startDate="@Model.StartDate" asp-route-endDate="@Model.EndDate" asp-route-roleId="@Model.RoleId">@i</a>
+                                            </li>
+                                        }
+
+                                    }
+
+                                    @if (!Model.Users.HasNextPage)
+                                    {
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">后页</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <a class="page-link" asp-controller="Log"
+                                               asp-action="Index"
+                                               asp-route-page="@(currentIndex + 1)" asp-route-keyword="@Model.Keyword" asp-route-startDate="@Model.StartDate" asp-route-endDate="@Model.EndDate" asp-route-roleId="@Model.RoleId" tabindex="-1">后页</a>
+                                        </li>
+                                    }
+
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-inline text-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon3"> 总记录<strong>@Model.TotalCount</strong>条，分页</span>
+                                    @Html.DropDownListFor(m => Model.PageSize, (SelectList)ViewBag.PageSizes, "分页", new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+     
+
+
+<div id="edit-container">
+</div>
+
+<div id="role-container">
+</div>
+<div id="pwd-container">
+</div>
+
+
+
+@section Footer {
+
+<script src="~/js/lib/jquery/plugins/jquery.validate.min.js"></script>
+<script src="~/js/lib/jquery/plugins/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/js/lib/jquery/plugins/jquery.unobtrusive-ajax.min.js"></script>
+ 
+
+    <script>
+        var modelName = "@EntityNames.User";
+
+        function OnSuccessLink(data) {
+            Common.ShowBox(data.Status,data.Message,"操作")
+        }
+
+        function onAjaxComplete() {
+            $('#ModalEdit').modal();
+        }
+
+        function onBeginSave() {
+            $("#btnSave i").removeClass("fa-save").addClass("fa-spinner fa-spin")
+        }
+        function onCompleteSave() {
+            $("#btnSave i").removeClass("fa-spinner fa-spin").addClass("fa-save")
+        }
+
+        
+        function onSuccess(data) {
+            var title = '@ViewBag.PageTitle';
+            Common.ShowBoxWithFuncBack(data, title, submitSuccess);
+        }
+
+        function submitSuccess(id, htmlData) {
+            $('#ModalEdit').modal('hide');
+            console.log(id);
+            if (id != null) {
+                var cid = "container" + id;
+                $("#" + cid).replaceWith(htmlData);
+            }
+            else {
+                $("#tbList").html(htmlData);
+
+            }
+        }
+
+          
+
+        //========== edit user ===========
+        function onAjaxEditComplete() {
+            $('#ModalEdit').modal();
+
+            $.validator.addMethod('qq', function (value, element) {
+                if (value.length > 0)
+                    return /^[1-9][0-9]{4,9}$/.test(value)
+                return true;
+            });
+            $.validator.unobtrusive.adapters.addBool("qq");
+
+            $.validator.addMethod('chinamobile', function (value, element) {
+                if (value.length > 0)
+                    return /^0{0,1}(13[0-9]|15[7-9]|153|156|170|178|18[0-9])[0-9]{8}$/.test(value)
+                return true;
+            });
+
+            $.validator.unobtrusive.adapters.addBool("chinamobile");
+        }
+
+
+
+
+        //========== edit user ===========
+
+        function SetPasswordSuccess(data) {
+            Common.ShowBoxWithFunc(data,"重设密码",funcRestPwdOK)
+            @*switch (data.Status) {
+                case 2:
+                    toastr.error(data.Message, '@modelName');
+                    break;
+                case 1:
+                    toastr.success("操作成功", '@modelName');
+                    $('#ModalUserPwd').modal('hide');
+                    break;
+                case 4:
+                    toastr.warning(data.Message, modelName)
+                    break;
+            }*@
+        }
+
+        function funcRestPwdOK() {
+            $('#ModalEdit').modal('hide');
+        }
+        //========== end edit user ===========
+            
+
+        $(function () {
+
+            $(document).on("change", '#PageSize', function (e) {
+                e.preventDefault();
+
+                var url = "@Url.Action("PageSizeSet")", title = "分页设置", pageSize = $(this).val();
+                Common.PageSizeSet(url, title, pageSize, setPageSizeFunc);
+
+            });
+            function setPageSizeFunc() {
+                location.reload();
+            }
+
+            //确认框默认语言
+            bootbox.setDefaults({
+                locale: "zh_CN"
+            });
+
+
+            //delete
+            $(document).on("click", '.delete-item', function (e) {
+                e.preventDefault();
+
+                var url = $(this).attr('data-url');
+                var that = $(this);
+                bootbox.setLocale("zh_CN");
+                bootbox.confirm("你确定要删除此项吗？", function (result) {
+                    if (result) {
+                        /*DELETE*/
+                        var title = "@ViewBag.PageTitle";
+                        Common.DeleteItem(url, title, that);
+                    }
+                });
+
+            });
+                      
+
+
+            //active
+            $(document).on("click", '.active-item', function (e) {
+                e.preventDefault();
+
+                var url = $(this).attr('data-url'), title = $(this).attr('title'), that = $(this);
+                Common.SingleActionWithFuncBack(url, title, that, submitFunc);
+
+            });
+
+            function submitFunc(that, data) {
+                var tr = that.closest('.item-container').replaceWith(data);
+            }
+
+
+        });
+    </script>
+}

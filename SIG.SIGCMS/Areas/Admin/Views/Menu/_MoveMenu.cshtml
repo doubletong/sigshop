@@ -1,0 +1,61 @@
+﻿@model MoveMenuVM
+
+@helper ShowTree(IEnumerable<Menu> menus)
+{
+    <ul class="menuTree menuTreeRole list-unstyled">
+        @foreach (var item in menus)
+        {
+            if (item.MenuType == MenuType.PAGE || item.MenuType == MenuType.NOLINK)
+            {
+                <li class="@(item.ChildMenus.Any() ? "hasMenus" : "")">
+                    <label class="@(item.Id==Model.Id ? "text-danger":"")">
+                        <input type="radio" name="menuId" value="@item.Id" @(Model.CurrentParentId == item.Id ?"checked":"") @(item.Id==Model.Id ? "disabled" : "") />
+                        @item.Title
+                    </label>
+                    @if (item.ChildMenus.Any())
+                    {
+                        @ShowTree(item.ChildMenus.OrderBy(c => c.Importance))
+                    }
+                </li>
+            }
+
+        }
+    </ul>
+}
+
+@using (Ajax.BeginForm("MoveMenu", "Menu",
+        new AjaxOptions()
+        {
+            HttpMethod = "POST",
+            OnBegin = "onBeginSave",
+            OnComplete = "onCompleteSave",
+            OnSuccess = "onSuccess",
+           // UpdateTargetId = $"menu{Model.CategoryId}"
+           // OnFailure = "handleError",         
+
+        }, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CurrentParentId)
+
+    <!-- 添加菜单 Modal -->
+    <div class="modal fade" id="ModalMenuForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">移动菜单</h4>
+                </div>
+                <div class="modal-body" style="height:450px;overflow-y:auto;padding-left:35px;">
+                    @ShowTree(Model.Menus)
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button class="btn btn-primary" type="submit" id="btnSave"><i class="fa fa-save fa-fw"></i>保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

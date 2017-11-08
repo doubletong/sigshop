@@ -17,7 +17,11 @@ using SIG.Data.Entity;
 using SIG.Repository;
 using SIG.Services.Identity;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using SIG.Infrastructure.Helper;
+using SIG.Services;
 using SIG.Services.Log;
+using SIG.Services.Menus;
 
 namespace SIG.SIGCMS
 {
@@ -47,6 +51,14 @@ namespace SIG.SIGCMS
                 options.LogoutPath = new PathString("/Account/LogOff");
                 options.AccessDeniedPath = new PathString("/Error/Login");
             });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SigAuth",
+                    policy => policy.Requirements.Add(new EnterBuildingRequirement()));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, BadgeEntryHandler>();
+            services.AddScoped<IViewRenderService, ViewRenderService>();
 
             services.AddMemoryCache();
             services.AddMvc();
@@ -54,11 +66,17 @@ namespace SIG.SIGCMS
      
             // Add application services. 依赖注入
             services.AddTransient<IUserServices, UserServices>();
+            services.AddTransient<IRoleServices, RoleServices>();
+            services.AddTransient<IMenuServices, MenuServices>();
+            services.AddTransient<IMenuCategoryServices, MenuCategoryServices>();
             services.AddTransient<ILogServices, LogServices>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+            ILoggerFactory loggerFactory)
         {
             //add NLog to ASP.NET Core
             loggerFactory.AddNLog();
@@ -68,6 +86,9 @@ namespace SIG.SIGCMS
             //needed for non-NETSTANDARD platforms: configure nlog.config in your project root. NB: you need NLog.Web.AspNetCore package for this.         
             env.ConfigureNLog("nlog.config");
             LogManager.Configuration.Variables["connectionString"] = Configuration.GetConnectionString("DefaultConnection");
+
+            HttpHelper.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
+
 
             if (env.IsDevelopment())
             {

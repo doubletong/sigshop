@@ -32,7 +32,7 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
                 Level = level,
 
                 PageIndex = (page ?? 1),
-                PageSize = 2 //SettingsManager.Log.PageSize
+                PageSize = SettingsManager.Log.PageSize
             };
             int totalCount;
             logSearchVM.Logs = _logServices.SearchLogs(logSearchVM.PageIndex - 1, logSearchVM.PageSize, startDate,

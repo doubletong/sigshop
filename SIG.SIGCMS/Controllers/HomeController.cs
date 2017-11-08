@@ -16,7 +16,8 @@ namespace SIG.SIGCMS.Controllers
         {
             this._logger = logger;
         }
-        [Authorize]
+        // [Authorize]
+        [Authorize(Policy = "SigAuth")]
         public IActionResult Index()
         {
             GlobalDiagnosticsContext.Set("CreatedBy", "doubletong");

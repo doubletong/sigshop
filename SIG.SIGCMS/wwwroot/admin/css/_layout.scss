@@ -1,0 +1,36 @@
+﻿.wrapper{
+    overflow: hidden;
+      width: 100%;
+}
+
+.leftcol {
+    position: absolute;
+    width: 170px;
+    left: 0;
+    float: left;
+    margin: 0;
+    background-color: #333333;
+    min-height: 100%;
+
+    .logo {
+        text-align: center;
+        text-align: center;
+        padding: 15px;
+        border-bottom: 1px #222222 solid;
+
+        img {
+            max-height: 51px;
+        }
+    }
+}
+.rightcol {
+  margin: 0 0 0 170px;
+  position: relative;
+  background-color: #ffffff;
+  height: 100%;
+  box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+.main-content {
+  padding: 20px;
+}

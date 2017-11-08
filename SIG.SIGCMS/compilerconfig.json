@@ -10,5 +10,9 @@
   {
     "outputFile": "wwwroot/admin/css/Style.css",
     "inputFile": "wwwroot/admin/css/Style.less"
+  },
+  {
+    "outputFile": "wwwroot/admin/css/main.css",
+    "inputFile": "wwwroot/admin/css/main.scss"
   }
 ]
