@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIG.WebAPICore2", "SIG.WebAPICore2\SIG.WebAPICore2.csproj", "{C17DF544-5FB6-4A35-A38F-B0B46B86022B}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIG.Services", "SIG.Services\SIG.Services.csproj", "{9A4AFD3E-D8D4-4837-B1BD-4D57D0F34DE5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIG.SIGCMS", "SIG.SIGCMS\SIG.SIGCMS.csproj", "{7BB8751D-0784-404D-BA61-339A135342E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIG.TestAPP", "SIG.TestAPP\SIG.TestAPP.csproj", "{0924F938-E170-4F2A-93F1-CE6C2BFF168D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{7BB8751D-0784-404D-BA61-339A135342E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BB8751D-0784-404D-BA61-339A135342E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BB8751D-0784-404D-BA61-339A135342E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0924F938-E170-4F2A-93F1-CE6C2BFF168D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0924F938-E170-4F2A-93F1-CE6C2BFF168D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0924F938-E170-4F2A-93F1-CE6C2BFF168D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0924F938-E170-4F2A-93F1-CE6C2BFF168D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

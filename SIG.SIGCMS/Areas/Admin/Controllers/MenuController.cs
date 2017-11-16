@@ -221,7 +221,7 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
                 // _menuService.ResetSort(orgMenu.CategoryId);
 
-                var menus = _menuService.GetLevelMenusByCategoryId(vMenu.CategoryId);
+              //  var menus = _menuService.GetLevelMenusByCategoryId(vMenu.CategoryId);
                 AR.Id = vMenu.CategoryId;
                 //// using a Model
                 //string html = view.Render("Emails/Test", new Product("Apple"));
@@ -292,8 +292,8 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> UpDownMoveAsync(int id, bool isUp, int categoryId)
+        //[ValidateAntiForgeryToken]
+        public IActionResult UpDownMove(int id, bool isUp, int categoryId)
         {
 
             if (isUp)
@@ -318,9 +318,9 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
             }
 
-            var menus = _menuService.GetLevelMenusByCategoryId(categoryId);
+           // var menus = _menuService.GetLevelMenusByCategoryId(categoryId);
             AR.Id = categoryId;
-            AR.Data = await _viewRenderService.RenderToStringAsync("_MenuList", menus);
+           // AR.Data = await _viewRenderService.RenderAsync("_MenuList", menus);
 
             AR.SetSuccess("菜单排位成功！");
             return Json(AR);
@@ -368,15 +368,15 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> ResetSort(int id)
+        public JsonResult ResetSort(int id)
         {
             try
             {
                 _menuService.ResetSort(id);
 
-                var menus = _menuService.GetLevelMenusByCategoryId(id);
+                //var menus = _menuService.GetLevelMenusByCategoryId(id);
                 AR.Id = id;
-                AR.Data = await _viewRenderService.RenderToStringAsync("_MenuList", menus);
+               // AR.Data = await _viewRenderService.RenderAsync("_MenuList", menus);
 
                 AR.SetSuccess(Messages.AlertActionSuccess);
                 return Json(AR);
@@ -390,14 +390,14 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
 
         [HttpGet]
-        public ActionResult MoveMenu(int id)
+        public IActionResult MoveMenu(int id)
         {
             var menu = _menuService.GetById(id);
-            var menus = _menuService.GetLevelMenusByCategoryId(menu.CategoryId);
+           // var menus = _menuService.GetLevelMenusByCategoryId(menu.CategoryId);
             MoveMenuVM vm = new MoveMenuVM
             {
                 Id = id,
-                Menus = menus, //_mapper.Map<List<Menu>, List<MenuVM>>(menus),
+             //   Menus = menus, //_mapper.Map<List<Menu>, List<MenuVM>>(menus),
                 CurrentParentId = (int)menu.ParentId,
                 CategoryId = menu.CategoryId
             };
@@ -407,7 +407,7 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> MoveMenu(int Id, int menuId)
+        public IActionResult MoveMenu(int Id, int menuId)
         {
 
             if (Id > 0 && menuId > 0)
@@ -418,11 +418,11 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
                 menu.LayoutLevel = parentMenu.LayoutLevel + 1;
                 _menuService.Update(menu);
 
-                _menuService.ResetSort(menu.CategoryId);
+                //_menuService.ResetSort(menu.CategoryId);
 
-                var menus = _menuService.GetLevelMenusByCategoryId(menu.CategoryId);
+               // var menus = _menuService.GetLevelMenusByCategoryId(menu.CategoryId);
                 AR.Id = menu.CategoryId;
-                AR.Data = await _viewRenderService.RenderToStringAsync("_MenuList", menus);
+               // AR.Data = await _viewRenderService.RenderAsync("_MenuList", menus);
 
                 return Json(AR);
 

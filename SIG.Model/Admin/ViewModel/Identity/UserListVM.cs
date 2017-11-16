@@ -14,7 +14,7 @@ namespace SIG.Model.Admin.ViewModel.Identity
 
         public string Keyword { get; set; }
 
-       
+        //[DateLessThan("EndDate", ErrorMessage = "开始日期必须小于截止日期")]
         public DateTime? StartDate { get; set; }
        
         public DateTime? EndDate { get; set; }

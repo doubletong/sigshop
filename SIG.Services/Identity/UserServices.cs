@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using SIG.Basic.Extensions;
 using SIG.Data.Entity.Identity;
 using SIG.Infrastructure.Helper;
@@ -21,7 +22,7 @@ namespace SIG.Services.Identity
 
         public User SignIn(string username, string password)
         {
-            var user = _unitOfWork.GetRepository<User>().GetFirstOrDefault(u=>u,u=>u.UserName == username );
+            var user = _unitOfWork.GetRepository<User>().GetFirstOrDefault(predicate:u=>u.UserName == username );
             if (user == null) return null;
 
             var salt = Convert.FromBase64String(user.SecurityStamp);
@@ -89,24 +90,29 @@ namespace SIG.Services.Identity
             return  _unitOfWork.GetRepository<User>().Find(id);
         }
 
+        public User GetByIdWidthUserRolos(Guid id)
+        {
+            return _unitOfWork.GetRepository<User>()
+                .GetFirstOrDefault(predicate: d => d.Id == id, include: d => d.Include(u => u.UserRoles));
+        }
+
         public void Update(User user)
         {
             _unitOfWork.GetRepository<User>().Update(user);
+            _unitOfWork.SaveChanges();
         }
 
-        public User SetRole(Guid userId, int[] roleId)
+        public void SetRole(Guid userId, int[] roleId)
         {
-            var user = GetById(userId);
-            var roles = _unitOfWork.GetRepository<Role>().GetAll().Where(r => roleId.Contains(r.Id)).ToList();
-
-            user.UserRoles.Clear();
-            foreach (Role r in roles)
+           // var user = GetById(userId);
+            var userRoles = _unitOfWork.GetRepository<UserRole>().GetMany(r => r.UserId == userId);
+            _unitOfWork.GetRepository<UserRole>().Delete(userRoles);
+        
+            foreach (var item in roleId)
             {
-                user.UserRoles.Add(new UserRole{RoleId = r.Id,UserId = userId});
+                _unitOfWork.GetRepository<UserRole>().Insert(new UserRole{UserId = userId,RoleId = item});
             }
-
-            Update(user);
-            return user;
+            _unitOfWork.SaveChanges();
         }
 
         /// <summary>
@@ -145,6 +151,7 @@ namespace SIG.Services.Identity
         public bool Delete(User user)
         {
              _unitOfWork.GetRepository<User>().Delete(user);
+            _unitOfWork.SaveChanges();
             return true;
         }
 
@@ -167,7 +174,7 @@ namespace SIG.Services.Identity
             count = _unitOfWork.GetRepository<User>().Count(expression);
 
             var result = _unitOfWork.GetRepository<User>().GetPagedList(predicate: expression, 
-                orderBy: d => d.OrderBy(l => l.CreateDate), 
+                orderBy: d => d.OrderByDescending(l => l.CreateDate), 
                 pageIndex: pageIndex, pageSize: pageSize);
             
 

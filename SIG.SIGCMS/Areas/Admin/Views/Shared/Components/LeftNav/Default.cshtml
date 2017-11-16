@@ -14,23 +14,38 @@
                 <ul class="list-unstyled mainmenu">
                     @foreach (var item in Model.Menus)
                     {
-                    if (item.Active)
-                    {
+
                         string url = string.IsNullOrEmpty(item.Url) ? "#" : item.Url;
                         string hasChilds = string.IsNullOrEmpty(item.Url) ? "down-nav" : "";
 
-                        if (Model.CurrentMenu != null)
-                        {
-                            string linkActive = item.Id == Model.CurrentMenu.Id ? "active" : "";
-                            string openav = Model.CurrentMenu.ParentId == item.Id ? "nav-open" : "";
+                        //if (Model.CurrentMenu != null)
+                        //{
+                        string linkActive = item.Id == Model.CurrentMenu.Id ? "active" : "";
+                        string openav = Model.CurrentMenu.ParentId == item.Id ? "nav-open" : "";
 
                                 <li class="@hasChilds @string.Format("level{0}", item.LayoutLevel) @openav" data-parent="@(item.ParentId??0)">
                                     <a href="@url" class="@linkActive" data-id="@item.Id">
                                         <i class="@item.Iconfont fa-fw"></i>@item.Title
                                     </a>
+                                    @if (item.ChildMenus.Any() && item.ParentId != null)
+                                    {
+                                        <ul class="submenu">
+                                            @foreach (var sub in item.ChildMenus)
+                                            {
+                                              
+                                                string subLinkActive = sub.Id == Model.CurrentMenu.Id ? "active" : "";
+                                                <li class="@string.Format("level{0}", sub.LayoutLevel) " data-parent="@(sub.ParentId ?? 0)">
+                                                    <a href="@sub.Url" class="@subLinkActive" data-id="@sub.Id">
+                                                        <i class="@sub.Iconfont fa-fw"></i>@sub.Title
+                                                    </a>
+                                                </li>
+                                            }
+                                           
+                                        </ul>
+                                    }
                                 </li>
-                            }
-                            else
+                            @*}*@
+                            @*else
                             {
 
                                 <li class="@hasChilds @string.Format("level{0}", item.LayoutLevel)" data-parent="@(item.ParentId??0)">
@@ -38,8 +53,8 @@
                                         <i class="@item.Iconfont fa-fw"></i>@item.Title
                                     </a>
                                 </li>
-                            }
-                        }
+                            }*@
+                        
                     }
                 </ul>
 

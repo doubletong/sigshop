@@ -27,10 +27,7 @@ namespace SIG.Data.Entity.Identity
         public string SecurityStamp { get; set; }
 
         public string RealName { get; set; }
-
         public string PhotoUrl { get; set; }
-
-
 
         public bool IsActive { get; set; }
 
@@ -60,10 +57,9 @@ namespace SIG.Data.Entity.Identity
         }
 
         public string QQ { get; set; }
-
         public string Mobile { get; set; }
-
-        public virtual ICollection<UserRole> UserRoles { get; set; }
         
+        public virtual ICollection<UserRole> UserRoles { get; set; }
+
     }
 }

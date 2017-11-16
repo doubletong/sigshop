@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
@@ -17,6 +18,7 @@ using SIG.Data.Entity;
 using SIG.Repository;
 using Swashbuckle.AspNetCore.Swagger;
 using SIG.Services.Identity;
+using SIG.SIGCMS;
 
 namespace SIG.WebAPICore2
 {
@@ -100,6 +102,8 @@ namespace SIG.WebAPICore2
                 //options.Filters.Add(new AuthorizeFilter(policy));
             }).AddXmlDataContractSerializerFormatters();
 
+           
+
             services.AddScoped<LogFilter>();
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -147,7 +151,7 @@ namespace SIG.WebAPICore2
             }
 
             //app.UseSession();
-          
+
             //DefaultFilesOptions options = new DefaultFilesOptions();
             //options.DefaultFileNames.Clear();
             //options.DefaultFileNames.Add("index.html");
@@ -156,6 +160,8 @@ namespace SIG.WebAPICore2
 
             //MVC 页面错误跳转带状态
             //app.UseStatusCodePagesWithReExecute("/Errors/Index", "?statusCode={0}");
+          
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

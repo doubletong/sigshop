@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SIG.Data.Entity.Identity;
 using SIG.Model.Admin.InputModel.Identity;
 using SIG.Model.Front.ViewModel;
 using SIG.Repository;
 using SIG.Resources.Front;
 using SIG.Services.Identity;
+
 
 namespace SIG.SIGCMS.Controllers
 {
@@ -21,10 +26,14 @@ namespace SIG.SIGCMS.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<AccountController> _logger;
         private readonly IUserServices _userServices;
-        public AccountController(IUnitOfWork unitOfWork, IUserServices userServices, ILogger<AccountController> logger)
+        private readonly IRoleServices _roleServices;
+        private readonly TokenOptions _tokenOptions;
+        public AccountController(IUnitOfWork unitOfWork, IUserServices userServices, IRoleServices roleServices, IOptions<TokenOptions> tokens,ILogger<AccountController> logger)
         {
             _unitOfWork = unitOfWork;
             _userServices = userServices;
+            _roleServices = roleServices;
+            _tokenOptions = tokens.Value;
             _logger = logger;
 
 
@@ -104,23 +113,22 @@ namespace SIG.SIGCMS.Controllers
             // create claims
             List<Claim> claims = new List<Claim>
             {
+                new Claim(ClaimTypes.Sid, lookupUser.Id.ToString()),
+                new Claim("RealName", lookupUser.RealName??"无"),
                 new Claim(ClaimTypes.Name, lookupUser.UserName),
                 new Claim(ClaimTypes.Email, lookupUser.Email)
             };
 
             // create identity
-            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-          
+            var userRoles =  _roleServices.GetRolesByUserId(lookupUser.Id).ToArray();
             //add a list of roles
-            if (lookupUser.UserRoles != null)
+           
+            if (userRoles.Any())
             {
-                var roles = lookupUser.UserRoles.Select(u => u.Role);
-
-                foreach (Role r in roles)
-                {
-                    identity.AddClaim(new Claim(ClaimTypes.Role, r.RoleName));
-                }
+                var roles = string.Join(",", userRoles.Select(d => d.RoleName));
+                identity.AddClaim(new Claim(ClaimTypes.Role, roles));
             }
 
             // create principal
@@ -148,6 +156,49 @@ namespace SIG.SIGCMS.Controllers
             return View();
         }
 
+
+        [HttpPost]
+        public IActionResult Token([FromBody] LoginIM model)
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest();
+            //}
+
+            var user = _userServices.SignIn(model.Username, model.Password); ;
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+
+            var token = GetJwtSecurityToken(user);
+
+            return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+        }
+        private JwtSecurityToken GetJwtSecurityToken(User user)
+        {
+            // var userClaims = await _userManager.GetClaimsAsync(user);
+            // create claims
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Sid, user.Id.ToString()),
+                new Claim("RealName", user.RealName??"无"),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenOptions.Key));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            return new JwtSecurityToken(
+                issuer: _tokenOptions.Issuer,
+                audience: _tokenOptions.Issuer,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(10),
+                signingCredentials: creds
+            );
+        }
         #region " Ajax "
 
 

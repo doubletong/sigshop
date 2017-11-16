@@ -1,4 +1,5 @@
-﻿@model IEnumerable<User>
+﻿@using SIG.Data.Entity.Identity
+@model IList<User>
 @foreach (var item in Model)
 {
     Html.RenderPartial("_UserItem", item);

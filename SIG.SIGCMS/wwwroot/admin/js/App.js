@@ -36,13 +36,8 @@
     $(".down-nav>a").click(function (e) {
         e.preventDefault();
 
-        var id = $(this).attr("data-id");
-        $('.mainmenu li[data-parent=' + id + ']').slideToggle();
-
-        //var n = $(this).next("ul");
+        $(this).next(".submenu").slideToggle();
         var li = $(this).closest('li');
-        //n.slideToggle();
-
         li.toggleClass('nav-open');
 
     });
@@ -60,7 +55,7 @@
         var marginLeft = $('#rightcol').css("margin-left");
         // console.log($('#rightcol').css("margin-left"));
 
-        if (marginLeft == '0px') {
+        if (marginLeft === '0px') {
             $('#rightcol').animate({ 'marginLeft': '170' }, 'fast');
             $('#wrapper').removeClass('nonav');
 

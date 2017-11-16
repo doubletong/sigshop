@@ -925,6 +925,15 @@ namespace SIG.Resources.Admin {
         }
         
         /// <summary>
+        ///   查找类似 角色名称 的本地化字符串。
+        /// </summary>
+        public static string RoleName {
+            get {
+                return ResourceManager.GetString("RoleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 示意图 的本地化字符串。
         /// </summary>
         public static string Schematic {

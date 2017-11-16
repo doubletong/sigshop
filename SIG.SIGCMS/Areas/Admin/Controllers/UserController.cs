@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using SIG.Data.Entity.Identity;
@@ -15,23 +23,27 @@ using SIG.Model.Admin.InputModel.Identity;
 using SIG.Model.Admin.ViewModel;
 using SIG.Model.Admin.ViewModel.Identity;
 using SIG.Resources.Admin;
+using SIG.Services;
 using SIG.Services.Identity;
 using TZGCMS.Model.Admin.ViewModel.Identity;
 
 namespace SIG.SIGCMS.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Policy = "Permission")]
     public class UserController : BaseController
     {
 
         private readonly IUserServices _userServices;
         private readonly IRoleServices _roleServices;
+        private readonly IViewRenderService _viewRenderService;
         private readonly IMapper _mapper;
 
-        public UserController(IUserServices userServices, IRoleServices roleServices, IMapper mapper)
+        public UserController(IUserServices userServices, IRoleServices roleServices, IViewRenderService viewRenderService, IMapper mapper)
         {
             _userServices = userServices;
             _roleServices = roleServices;
+            _viewRenderService = viewRenderService;
             _mapper = mapper;
 
         }
@@ -59,9 +71,11 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
             userListVM.TotalCount = totalCount;
 
-            // var userList = _mapper.Map<IList<User>, IList<UserVM>>(users);
-            //userListVM.Users = new StaticPagedList<User>(users, userListVM.PageIndex, userListVM.PageSize, userListVM.TotalCount);
-            // ViewBag.OnePageOfUsers = usersAsIPagedList;
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_UserList", userListVM.Users.Items);
+            }
+
             ViewBag.PageSizes = new SelectList(Site.PageSizes());
 
             var roleList = _roleServices.GetAll().Where(m => m.Id != SettingsManager.Role.Founder).ToList();
@@ -101,24 +115,45 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
         public IActionResult Details(Guid id)
         {
 
-            var user = _userServices.GetById(id);
+            var user = _userServices.GetByIdWidthUserRolos(id);
+           
             if (user == null)
             {
                 return NotFound();
             }
-            return PartialView("_Detail", user);
+
+            //if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            //{
+            //    return PartialView("_Detail", vm);
+            //}
+            var vm = _mapper.Map<UserDetailVM>(user);
+            vm.Roles = _roleServices.GetAll().Where(d => user.UserRoles.Any(u => u.RoleId == d.Id)).Select(d => d.RoleName).ToArray();
+
+            return PartialView("_Detail", vm);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetUserForItem(Guid id)
+        {
+            var user = _userServices.GetByIdWidthUserRolos(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return PartialView("_UserItem", user);
         }
 
         // GET: User/Create
         public ActionResult Create()
         {
-            RegisterIM vm = new RegisterIM();
+            UserIM vm = new UserIM();
             return PartialView("_UserCreate", vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Create(RegisterIM model)
+        public JsonResult Create(UserIM model)
         {
             if (!ModelState.IsValid)
             {
@@ -142,15 +177,14 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
             }
 
 
-            int count;
-            int pageSize = SettingsManager.User.PageSize;
-            var list = _userServices.GetPagedElements(0, pageSize, string.Empty, null, null, null, out count);
-            //    List<UserVM> userList = _mapper.Map<List<User>, List<UserVM>>(list);
+            //int count;
+            //int pageSize = SettingsManager.User.PageSize;
+            //var list = _userServices.GetPagedElements(0, pageSize, string.Empty, null, null, null, out count);
+            //List<UserVM> userList = _mapper.Map<List<User>, List<UserVM>>(list);
             //AR.Data = RenderPartialViewToString("_UserList", list);
-
+            AR.Id = "0";
             AR.SetSuccess(string.Format(Messages.AlertCreateSuccess, EntityNames.User));
             return Json(AR);
-
 
 
         }
@@ -223,14 +257,13 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
                 user.Mobile = profile.Mobile;
                 user.Gender = profile.Gender;
                 user.Birthday = profile.Birthday;
-
                 _userServices.Update(user);
-
                 // var userVM = _mapper.Map<UserVM>(user);
 
                 AR.Id = user.Id;
-               // AR.Data = RenderPartialViewToString("_UserItem", user);
-
+                //var aa = PartialView("_UserItem", user).ToString();
+                //AR.Data = aa;
+                //AR.Data = await _viewRenderService.RenderAsync("User/_UserItem", user);
 
                 AR.SetSuccess(string.Format(Messages.AlertUpdateSuccess, EntityNames.User));
                 return Json(AR);
@@ -255,12 +288,12 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
         [HttpGet]
         public PartialViewResult SetRole(Guid id)
         {
-            var user = _userServices.GetById(id);
+            var user = _userServices.GetByIdWidthUserRolos(id);
             var userRoles = user.UserRoles;
             SetUserRolesVM vm = new SetUserRolesVM
             {
                 UserId = id,
-                RoleIds = userRoles.Select(r => r.RoleId).ToArray(),
+                RoleIds = userRoles?.Select(r => r.RoleId).ToArray(),
                 Roles = _roleServices.GetAll().Where(r => r.Id != SettingsManager.Role.Founder)
             };
 
@@ -269,35 +302,18 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public JsonResult SetRole(Guid UserId, int[] RoleId)
+        public JsonResult SetRole(Guid userId, int[] roleId)
         {
             try
             {
-                // _userServices.SetUserRoles(UserId, RoleId);
-
-                //var user = _userServices.GetById(UserId);
-                //var roles = _roleServices.GetAll().Where(r => RoleId.Contains(r.Id)).ToList();
-
-                //user.Roles.Clear();
-                //foreach (Role r in roles)
+                _userServices.SetRole(userId, roleId);
+                //if (User.Identity.Name == user.UserName)
                 //{
-                //    user.Roles.Add(r);
+                //    SetUserCookies(true, user);
                 //}
-
-                //_userServices.Update(user);
-                var user = _userServices.SetRole(UserId, RoleId);
-
-
-                if (User.Identity.Name == user.UserName)
-                {
-                   // SetUserCookies(true, user);
-                }
-
-
-                //    var userVM = _mapper.Map<UserVM>(user);
-                AR.Id = user.Id;
+          
+                AR.Id = userId;
               //  AR.Data = RenderPartialViewToString("_UserItem", user);
-
                 AR.SetSuccess(Messages.AlertActionSuccess);
                 return Json(AR);
             }
@@ -373,7 +389,7 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
             var result = _userServices.SetPassword(model.UserId, model.NewPassword);
             if (result)
             {
-
+                AR.Id = model.UserId;
                 AR.SetSuccess(Messages.AlertActionSuccess);
                 return Json(AR);
             }
@@ -391,9 +407,7 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
             {
                 user.IsActive = !user.IsActive;
                 _userServices.Update(user);
-
                 //    var userVM = _mapper.Map<UserVM>(user);
-
                 AR.Id = user.Id;
              //   AR.Data = RenderPartialViewToString("_UserItem", user);
 
@@ -428,6 +442,34 @@ namespace SIG.SIGCMS.Areas.Admin.Controllers
 
             _userServices.Delete(user);
             return Json(AR);
+        }
+    }
+
+    public static class ViewResultExtensions
+    {
+        public static string ToHtml(this PartialViewResult result, HttpContext httpContext)
+        {
+            var feature = httpContext.Features.Get<IRoutingFeature>();
+            var routeData = feature.RouteData;
+            var viewName = result.ViewName ?? routeData.Values["action"] as string;
+            var actionContext = new ActionContext(httpContext, routeData, new ControllerActionDescriptor());
+            var options = httpContext.RequestServices.GetRequiredService<IOptions<MvcViewOptions>>();
+            var htmlHelperOptions = options.Value.HtmlHelperOptions;
+            var viewEngineResult = result.ViewEngine?.FindView(actionContext, viewName, true) ?? options.Value.ViewEngines.Select(x => x.FindView(actionContext, viewName, true)).FirstOrDefault(x => x != null);
+            var view = viewEngineResult.View;
+            var builder = new StringBuilder();
+
+            using (var output = new StringWriter(builder))
+            {
+                var viewContext = new ViewContext(actionContext, view, result.ViewData, result.TempData, output, htmlHelperOptions);
+
+                view
+                    .RenderAsync(viewContext)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
+            return builder.ToString();
         }
     }
 }

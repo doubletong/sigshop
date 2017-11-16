@@ -9,13 +9,13 @@
 
     <div class="row">
      
-        <div class="col-sm-6">
+        <div class="col-sm-12 col-md-12 col-lg-6">
             <div class="panel panel-default">
                 <header class="panel-heading">
                     <h3 class="panel-title">
                         <i class="fa fa-navicon"></i> @Model.Title
                     </h3>
-                    <button type="button" class="btn btn-info btn-sm btn-refresh" data-id="@Model.Id" data-url="@Url.Action("resetSort",new { id=Model.Id})"><i class="fa fa-sort-numeric-asc"></i></button>
+                    <button type="button" class="btn btn-info btn-sm btn-refresh" data-id="@Model.Id" data-url="@Url.Action("ResetSort",new { id=Model.Id})"><i class="fa fa-sort-numeric-asc"></i></button>
                 </header>
                 <section class="panel-body" id="@string.Format("menu{0}", Model.Id)">
                     @*<a asp-controller="Menu" asp-action="CreateMenu" data-route-parentId="1" data-route-categoryId="1" data-ajax="true" data-ajax-method="GET"
@@ -58,7 +58,7 @@
         .panel-body {
             padding-top: 1rem;
         }
-        li a{
+        .panel-body li a {
             margin-left: .3rem;
         }
         
@@ -72,10 +72,15 @@
 
         <script>
             function onBegin() {
-                //  $("#divLoading").removeClass("divhide").addClass("divShow");
+                var iconEl = $(this).find("i.fa");
+                var icon = iconEl.attr("data-icon");
+                iconEl.removeClass(icon).addClass("fa-spinner fa-spin");
             }
 
             function onComplete() {
+                var iconEl = $(this).find("i.fa");
+                var icon = iconEl.attr("data-icon");
+                iconEl.removeClass("fa-spinner fa-spin").addClass(icon);
                 $('#ModalMenuForm').modal();
             }
             function onSuccess(data) {
@@ -104,19 +109,20 @@
             function submitSuccess(id, htmlData) {
                
                 $('#ModalMenuForm').modal('hide');
-                $("#menu" + id).html(htmlData);
-
+               
                 $.ajax({
                     method: 'GET',
                     url: '@Url.Action("GetMenus", "Menu")?categoryId=' + id
                 }).done(function (data, statusText, xhdr) {
+               
                     $("#menu" + id).html(data);
+
                     }).fail(function (xhdr, statusText, errorText) {
                         toastr.error(JSON.stringify(xhdr), '@ViewBag.Title');
                     //$("#result").text(JSON.stringify(xhdr));
                 });
 
-                //debugger;
+              
             }
 
 
@@ -191,33 +197,7 @@
                 });
 
 
-                //排序向上移动
-                $(document).on("click", ".moveMenu", function (e) {
-                    var url = $(this).attr('href');
-                    var categoryId = $(this).attr('data-categoryid');
-                    var that = $(this);
-                    var title = "排序";
-                    e.preventDefault();
-
-                    Common.SingleActionWithFuncBack(url, title, categoryId, resetSortSuccess);
-
-                    @*$.post(url, $("#anti-form").serialize(), function (data) {
-
-                        switch (data.Status) {
-                            case 2:
-                                toastr.error(data.Message, '@ViewBag.Title');
-                                break;
-                            case 3:
-                                toastr.info(data.Message, '@ViewBag.Title');
-                                break;
-                            case 1:
-                                toastr.success("已成功排位菜单", '@ViewBag.Title');
-                                setTimeout(function () {
-                                    location.reload();
-                                }, 1000);
-                        }
-                    });*@
-                });
+              
 
                 //激活
                 $('.active-item').click(function (e) {

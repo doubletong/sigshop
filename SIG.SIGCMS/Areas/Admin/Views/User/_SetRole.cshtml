@@ -1,7 +1,8 @@
 ﻿
+@using TZGCMS.Model.Admin.ViewModel.Identity
 @model SetUserRolesVM
 
-@using (Ajax.BeginForm("SetRole", "User",
+@*@using (Ajax.BeginForm("SetRole", "User",
                             new AjaxOptions()
                             {
                                 HttpMethod = "POST",
@@ -12,8 +13,12 @@
                                 //  UpdateTargetId = "RoleList"
 
                             }, new { @class = "form-horizontal", role = "form" }))
-{
-    @Html.AntiForgeryToken()
+{*@
+<form asp-controller="User" asp-action="SetRole" data-ajax-begin="onBeginSave" data-ajax-complete="onCompleteSave"
+      data-ajax-failure="onFailed" data-ajax-success="onSuccessSave"
+      data-ajax="true" data-ajax-method="POST">
+
+@Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
     @Html.HiddenFor(m => m.UserId)
     <!-- 添加菜单 Modal -->
@@ -21,8 +26,10 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">设置角色</h4>
+                    <h5 class="modal-title" id="myModalLabel">设置角色</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
 
@@ -49,7 +56,7 @@
             </div>
         </div>
     </div>
-}
+</form>
 
 <script type="text/javascript" language=javascript>
     $.validator.unobtrusive.parse(document);

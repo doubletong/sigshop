@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,8 +17,9 @@ namespace SIG.SIGCMS.Controllers
         {
             this._logger = logger;
         }
-        // [Authorize]
-        [Authorize(Policy = "SigAuth")]
+        // [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        //[Authorize(Policy = "SigAuth")]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public IActionResult Index()
         {
             GlobalDiagnosticsContext.Set("CreatedBy", "doubletong");

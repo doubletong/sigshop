@@ -15,8 +15,9 @@ namespace SIG.Services.Identity
         User SignIn(string username, string password);
 
         User GetById(Guid id);
+        User GetByIdWidthUserRolos(Guid id);
         void Update(User user);
-        User SetRole(Guid userId, int[] roleId);
+        void SetRole(Guid userId, int[] roleId);
         bool SetPassword(Guid userId, string password);
         bool Delete(User user);
         IPagedList<User> GetPagedElements(int pageIndex, int pageSize, string keyword, DateTime? startDate,

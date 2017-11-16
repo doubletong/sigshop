@@ -1,0 +1,6 @@
+﻿@using SIG.Data.Entity.Identity
+@model IEnumerable<Role>
+@foreach (var item in Model)
+{
+    Html.RenderPartial("_RoleItem", item);
+}

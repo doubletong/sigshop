@@ -24,7 +24,7 @@ namespace SIG.SIGCMS.Areas.Admin.Models.Shared
         {
             LeftNavVM vm = new LeftNavVM
             {
-                Menus = _menuServices.GetShowMenus(categoryId),
+                Menus = _menuServices.GetLeftMenus(categoryId),//_menuServices.GetShowMenus(categoryId),
                 CurrentMenu = _menuServices.GetCurrenMenu(viewContext)
             };
             return View(vm);

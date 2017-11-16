@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -17,7 +18,10 @@ using SIG.Data.Entity;
 using SIG.Repository;
 using SIG.Services.Identity;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.IdentityModel.Tokens;
 using SIG.Infrastructure.Helper;
 using SIG.Services;
 using SIG.Services.Log;
@@ -30,41 +34,72 @@ namespace SIG.SIGCMS
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IConfiguration Configuration { get; }
-        public Startup(IConfiguration configuration)
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            Configuration = builder.Build();
         }
+        //public Startup(IConfiguration configuration)
+        //{
+        //    Configuration = configuration;
+        //}
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SIGDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                        b => b.MigrationsAssembly("SIG.SIGCMS")))
+                        b => b.MigrationsAssembly("SIG.SIGCMS")), ServiceLifetime.Singleton, ServiceLifetime.Singleton)
                 .AddUnitOfWork<SIGDbContext>();
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            services.AddAuthentication(
+            //    options =>
+            //{
+            //    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}
+            ).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
                 options.LoginPath = new PathString("/Account/LogIn");
                 options.LogoutPath = new PathString("/Account/LogOff");
-                options.AccessDeniedPath = new PathString("/Error/Login");
-            });
+                options.AccessDeniedPath = new PathString("/Errors/AccessDenied");
+            })
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = Configuration["TokenOptions:Issuer"],
+                        ValidAudience = Configuration["TokenOptions:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenOptions:Key"])),
+                    };
+                });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("SigAuth",
-                    policy => policy.Requirements.Add(new EnterBuildingRequirement()));
+                options.AddPolicy("Permission", policy => policy.Requirements.Add(new PermissionRequirement("/errors/accessdenied")));
             });
-
-            services.AddSingleton<IAuthorizationHandler, BadgeEntryHandler>();
+            //
+            services.Configure<RazorViewEngineOptions>(options => {
+                options.ViewLocationExpanders.Add(new ViewLocationExpander());
+            });
+            //services.AddSingleton<DbContext, SIGDbContext>();
+            services.AddSingleton<IUnitOfWork, UnitOfWork<SIGDbContext>>();
+            services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+            //services.AddScoped<DbContext, SIGDbContext>();
+            //services.AddScoped<IUnitOfWork, UnitOfWork<SIGDbContext>>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
 
             services.AddMemoryCache();
             services.AddMvc();
             services.AddAutoMapper();
-     
+
             // Add application services. 依赖注入
+            //services.AddTransient<DbContext, SIGDbContext>();
+            //services.AddTransient<IUnitOfWork, UnitOfWork<SIGDbContext>>();
             services.AddTransient<IUserServices, UserServices>();
             services.AddTransient<IRoleServices, RoleServices>();
             services.AddTransient<IMenuServices, MenuServices>();
@@ -72,6 +107,11 @@ namespace SIG.SIGCMS
             services.AddTransient<ILogServices, LogServices>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            //services.AddAuthorization(options => options.AddPolicy("Trusted", policy => policy.RequireClaim("Employee", "Mosalla")));
+
+            services.AddOptions();
+            services.Configure<TokenOptions>(Configuration.GetSection("TokenOptions"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

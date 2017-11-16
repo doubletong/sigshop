@@ -14,57 +14,75 @@ using Microsoft.AspNetCore.Routing;
 
 namespace SIG.Services
 {
-    public interface IViewRenderService
-    {
-        Task<string> RenderToStringAsync(string viewName, object model);
-    }
-
     public class ViewRenderService : IViewRenderService
     {
-        private readonly IRazorViewEngine _razorViewEngine;
+        private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly IServiceProvider _serviceProvider;
 
-        public ViewRenderService(IRazorViewEngine razorViewEngine,
+        public ViewRenderService(
+            IRazorViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
             IServiceProvider serviceProvider)
         {
-            _razorViewEngine = razorViewEngine;
+            _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<string> RenderToStringAsync(string viewName, object model)
+        public async Task<string> RenderAsync(string name)
         {
-            var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            return await RenderAsync<object>(name, null);
+        }
 
-            using (var sw = new StringWriter())
+        public async Task<string> RenderAsync<TModel>(string name, TModel model)
+        {
+           
+            var actionContext = GetActionContext();
+            //var viewEngineResult = _viewEngine.GetView("", "~/Areas/Admin/Views/User/_UserItem.cshtml", false);
+            var viewEngineResult = _viewEngine.FindView(actionContext, name, false);
+
+            if (!viewEngineResult.Success)
             {
-                var viewResult = _razorViewEngine.FindView(actionContext, viewName, false);
+                throw new InvalidOperationException(string.Format("Couldn't find view '{0}'", name));
+            }
 
-                if (viewResult.View == null)
-                {
-                    throw new ArgumentNullException($"{viewName} does not match any available view");
-                }
+            var view = viewEngineResult.View;
 
-                var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                {
-                    Model = model
-                };
-
+            using (var output = new StringWriter())
+            {
                 var viewContext = new ViewContext(
                     actionContext,
-                    viewResult.View,
-                    viewDictionary,
-                    new TempDataDictionary(actionContext.HttpContext, _tempDataProvider),
-                    sw,
-                    new HtmlHelperOptions()
-                );
+                    view,
+                    new ViewDataDictionary<TModel>(
+                        metadataProvider: new EmptyModelMetadataProvider(),
+                        modelState: new ModelStateDictionary())
+                    {
+                        Model = model
+                    },
+                    new TempDataDictionary(
+                        actionContext.HttpContext,
+                        _tempDataProvider),
+                    output,
+                    new HtmlHelperOptions());
 
-                await viewResult.View.RenderAsync(viewContext);
-                return sw.ToString();
+                await view.RenderAsync(viewContext);
+
+                return output.ToString();
             }
         }
+
+        private ActionContext GetActionContext()
+        {
+            var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
+            return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+        }
+    }
+
+    public interface IViewRenderService
+    {
+        Task<string> RenderAsync(string name);
+
+        Task<string> RenderAsync<TModel>(string name, TModel model);
     }
 }

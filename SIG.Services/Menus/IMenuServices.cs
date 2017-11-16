@@ -1,6 +1,9 @@
 ﻿
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SIG.Data.Entity.Identity;
 
 namespace SIG.Services.Menus
 {
@@ -11,28 +14,29 @@ namespace SIG.Services.Menus
         //// Menu UpdateAndSort(Menu menu);
         //void ResetSort(int categoryId);
         //Menu GetMenuWithChildMenus(int Id);
-        List<Data.Entity.Identity.Menu> GetShowMenus(int categoryId);
+        List<Menu> GetShowMenus(int categoryId);
 
         //Task<IEnumerable<Menu>> GetMenus(int categoryId, CancellationToken cancellationToken = default(CancellationToken));
         //int UpMoveMenu(int id);
         //int DownMoveMenu(int id);
         //List<Menu> GetFaltMenus(int categoryId);
         ////List<MenuVM> GetFaltMenus(int categoryId);
-
-        IEnumerable<Data.Entity.Identity.Menu> GetMenusByCategoryId(int categoryId);
-        IEnumerable<Data.Entity.Identity.Menu> GetLevelMenusByCategoryId(int categoryId);
-        Data.Entity.Identity.Menu GetByIdWithChilds(int id);
+        IEnumerable<Menu> GetLeftMenus(int categoryId);
+        IEnumerable<Menu> GetMenusByCategoryId(int categoryId);
+        IEnumerable<Menu> GetLevelMenusByCategoryId(int categoryId);
+        Task<IEnumerable<Menu>> GetRolesMenusByUserId(Guid userId);
+        Menu GetByIdWithChilds(int id);
         int UpMoveMenu(int id);
         int DownMoveMenu(int id);
 
-        List<Data.Entity.Identity.Menu> CurrenMenuCrumbs(int categoryId, ViewContext viewContext);
+        List<Menu> CurrenMenuCrumbs(int categoryId, ViewContext viewContext);
 
-        Data.Entity.Identity.Menu GetCurrenMenu(ViewContext viewContext);
+        Menu GetCurrenMenu(ViewContext viewContext);
         void ResetSort(int categoryId);
 
-        Data.Entity.Identity.Menu GetById(int id);
-        bool Update(Data.Entity.Identity.Menu menu);
-        bool Create(Data.Entity.Identity.Menu menu);
-        bool Delete(Data.Entity.Identity.Menu menu);
+        Menu GetById(int id);
+        bool Update(Menu menu);
+        bool Create(Menu menu);
+        bool Delete(Menu menu);
     }
 }

@@ -53,10 +53,14 @@ namespace SIG.SIGCMS.Areas.Admin.Models.Menu
                     }
                 }
                 menuTree = menuTree + item.Title;
-                menuTree = menuTree + $"<a href = \"{Url.Action("UpDownMove", new { id = item.Id, isUp = true, categoryId = item.CategoryId })}\" class=\"moveMenu\" title=\"向上\" data-id=\"{item.Id}\" data-categoryid=\"{item.CategoryId}\"><i class=\"fa fa-chevron-up\"></i></a>";
-                menuTree = menuTree + $"<a href = \"{Url.Action("UpDownMove", new { id = item.Id, isUp = false, categoryId = item.CategoryId })}\" class=\"moveMenu\" title=\"向下\" data-id=\"{item.Id}\" data-categoryid=\"{item.CategoryId}\"><i class=\"fa fa-chevron-down\"></i></a>";
+                menuTree = menuTree + $"<a href = \"{Url.Action("UpDownMove", new { id = item.Id, isUp = true, categoryId = item.CategoryId })}\" title=\"向上\" data-ajax = \"true\"  " +
+                           $"data-ajax-method = \"POST\" data-ajax-mode = \"replace\" data-ajax-update=\"#edit-container\" data-ajax-begin = \"onBegin\" " +
+                           $"data-ajax-complete = \"onComplete\" data-ajax-failure = \"onFailed\" data-ajax-success = \"onSuccessSave\" ><i class=\"fa fa-chevron-up\" data-icon=\"fa-chevron-up\"></i></a>";
+                menuTree = menuTree + $"<a href = \"{Url.Action("UpDownMove", new { id = item.Id, isUp = false, categoryId = item.CategoryId })}\" title=\"向下\" data-ajax = \"true\"  " +
+                           $"data-ajax-method = \"POST\" data-ajax-mode = \"replace\" data-ajax-update=\"#edit-container\" data-ajax-begin = \"onBegin\" " +
+                           $"data-ajax-complete = \"onComplete\" data-ajax-failure = \"onFailed\" data-ajax-success = \"onSuccessSave\" ><i class=\"fa fa-chevron-down\" data-icon=\"fa-chevron-down\"></i></a>";
                 menuTree = menuTree +
-                           $"<a href=\"{Url.Action("MoveMenu", "Menu")}\" data-route-id= \"{item.Id}\" data-ajax = \"true\" title = \"移动菜单\" " +
+                           $"<a href=\"{Url.Action("MoveMenu", "Menu",new {id=item.Id})}\" data-ajax = \"true\" title = \"移动菜单\" " +
                            $"data-ajax-method = \"GET\" data-ajax-mode = \"replace\" data-ajax-update=\"#edit-container\" data-ajax-begin = \"onBegin\" " +
                            $"data-ajax-complete = \"onComplete\" data-ajax-failure = \"onFailed\" data-ajax-success = \"onSuccess\">" +
                            $"<i class=\"fa fa-chevron-right\"></i></a>";

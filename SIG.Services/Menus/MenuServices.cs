@@ -5,6 +5,7 @@ using SIG.Data.Enums;
 using SIG.Infrastructure.Configs;
 using SIG.Repository;
 using System.Linq;
+using System.Threading.Tasks;
 using SIG.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using SIG.Data.Entity.Identity;
@@ -75,6 +76,18 @@ namespace SIG.Services.Menus
             return menus;
 
         }
+        public IEnumerable<Menu> GetLeftMenus(int categoryId)
+        {
+
+            var menus = _unitOfWork.GetRepository<Menu>().
+                GetMany(predicate: m => m.CategoryId == categoryId && m.Active && 
+                (m.MenuType == MenuType.NOLINK || m.MenuType == MenuType.PAGE) && m.LayoutLevel < 2, 
+                                                                       orderBy: d => d.OrderBy(m => m.Importance),
+                                                                       include: d => d.Include(m => m.ChildMenus));
+
+            return menus;
+
+        }
 
         /// <summary>
         /// 获取需要高亮的菜单ID
@@ -139,7 +152,18 @@ namespace SIG.Services.Menus
         /// <returns></returns>
         public IEnumerable<Menu> GetMenusByCategoryId(int categoryId)
         {
-            return _unitOfWork.GetRepository<Menu>().GetMany(m => m.CategoryId == categoryId).OrderBy(m => m.Importance);
+            return _unitOfWork.GetRepository<Menu>().GetMany(predicate: m => m.CategoryId == categoryId,
+                orderBy:d=>d.OrderBy(m=>m.Importance), 
+                include:d=>d.Include(m=>m.ChildMenus));
+        }
+
+        public async Task<IEnumerable<Menu>> GetRolesMenusByUserId(Guid userId)
+        {
+            var roles = await _unitOfWork.GetRepository<UserRole>().GetManyAsync(predicate: d => d.UserId == userId);
+            var roleIds = roles.Select(d => d.RoleId);
+            var menus = await _unitOfWork.GetRepository<RoleMenu>().GetManyAsync(predicate: m => roleIds.Contains(m.RoleId));
+            var menuIds = menus.Select(d => d.MenuId);
+            return await _unitOfWork.GetRepository<Menu>().GetManyAsync(predicate:d=>menuIds.Contains(d.Id));
         }
 
         /// <summary>
@@ -192,59 +216,60 @@ namespace SIG.Services.Menus
         /// <param name="categoryId"></param>
         public void ResetSort(int categoryId)
         {
-            var menuList = _unitOfWork.GetRepository<Menu>().GetMany(predicate: d => d.CategoryId == categoryId && d.ParentId == null, include: d => d.Include(m => m.ChildMenus),disableTracking:false).AsEnumerable();
+            var menuList = _unitOfWork.GetRepository<Menu>().GetMany(predicate: d => d.CategoryId == categoryId, include: d => d.Include(m => m.ChildMenus));
             var list = menuList.Where(m => m.ParentId == null).OrderBy(m => m.Importance)
                 .SelectDeep<Menu>(m => m.ChildMenus.OrderBy(g => g.Importance));
 
             int i = 0;
             foreach (var item in list)
             {
-                //var m = _unitOfWork.GetRepository<Menu>().Find(item.Id);
-                //if (m != null)
-                //{
-                //    m.Importance = i;
-                //    _unitOfWork.GetRepository<Menu>().Update(m);
-                //}
-                item.Importance = i;
-                _unitOfWork.GetRepository<Menu>().Update(item);
+                var menu = GetById(item.Id);
+                menu.Importance = i;
+                _unitOfWork.GetRepository<Menu>().Update(menu);
                 i++;
             }
             _unitOfWork.SaveChanges();
-            //   _menuRepository.UnitOfWork.Commit();
-            // _cacheService.Invalidate(EntityNames.Menu);
-            // return menu;
+        
         }
 
         /// <summary>
         /// 向上移动
         /// </summary>
-        /// <param name = "id" ></ param >
-        /// < returns ></ returns >
+        /// <param name = "id" ></param >
+        /// < returns ></returns >
         public int UpMoveMenu(int id)
         {
-            Menu vMenu = GetById(id);
+            var vMenu = _unitOfWork.GetRepository<Menu>().GetFirstOrDefault(predicate: d => d.Id == id);
             var menuList = GetMenusByCategoryId(vMenu.CategoryId).OrderBy(m => m.Importance);
 
-            Menu prevMenu = menuList.Where(m => m.ParentId == vMenu.ParentId &&
-                m.Importance < vMenu.Importance).OrderByDescending(m => m.Importance).FirstOrDefault();
+            Menu prevMenu = _unitOfWork.GetRepository<Menu>().GetFirstOrDefault(
+                predicate: d => d.ParentId == vMenu.ParentId && d.Id !=vMenu.Id && d.Importance <= vMenu.Importance,
+                orderBy: d => d.OrderByDescending(m => m.Importance));
 
-            if (prevMenu == null)
-            {
-                // 已经在第一位
-                return 0;
-            }
+
+            //if (prevMenu == null)
+            //{
+            //    // 已经在第一位
+            //    return 0;
+            //}
             var num = prevMenu.Importance - vMenu.Importance;
-            prevMenu.Importance = prevMenu.Importance - num;
-            vMenu.Importance = vMenu.Importance + num;
+            if (num == 0)
+            {
+                vMenu.Importance = vMenu.Importance - 1;
+            }
+            else
+            {
+                prevMenu.Importance = prevMenu.Importance - num;
+                vMenu.Importance = vMenu.Importance + num;
+            }
+           
 
             Update(prevMenu);
             Update(vMenu);
+            // _unitOfWork.SaveChanges();
 
-            ResetSort(vMenu.CategoryId);
-            //SetMenuImportance(vMenu.Id, num);
-            //SetMenuImportance(prevMenu.Id, -num);
+            // ResetSort(vMenu.CategoryId);
 
-            // _cacheService.Invalidate(EntityNames.Menu);
             return 1;
         }
 
@@ -255,24 +280,39 @@ namespace SIG.Services.Menus
         /// <returns></returns>
         public int DownMoveMenu(int id)
         {
-            Menu vMenu = GetById(id);
-            var menuList = GetMenusByCategoryId(vMenu.CategoryId).OrderBy(m => m.Importance); ;
+            var vMenu = _unitOfWork.GetRepository<Menu>().GetFirstOrDefault(predicate: d=>d.Id == id);
+            var menuList = GetMenusByCategoryId(vMenu.CategoryId).OrderBy(m => m.Importance); 
 
-            Menu nextMenu = menuList.Where(m => m.ParentId == vMenu.ParentId &&
-                m.Importance > vMenu.Importance).OrderBy(m => m.Importance).FirstOrDefault();
-
-
-            if (nextMenu == null)
-            {
-                // 已经在最后一位
-                return 0;
-            }
+            Menu nextMenu = _unitOfWork.GetRepository<Menu>().GetFirstOrDefault(
+                predicate: d => d.ParentId == vMenu.ParentId && d.Id != vMenu.Id && d.Importance >= vMenu.Importance,
+                orderBy: d => d.OrderBy(m => m.Importance));
+            //Menu nextMenu = menuList.Where(m => m.ParentId == vMenu.ParentId &&
+            //    m.Importance > vMenu.Importance).OrderBy(m => m.Importance).FirstOrDefault();
 
 
+            //if (nextMenu == null)
+            //{
+            //    // 已经在最后一位
+            //    return 0;
+            //}
+            
             var num = nextMenu.Importance - vMenu.Importance;
-            nextMenu.Importance = nextMenu.Importance - num;
-            vMenu.Importance = vMenu.Importance + num;
-            ResetSort(vMenu.CategoryId);
+            if (num == 0)
+            {
+                vMenu.Importance = vMenu.Importance + 1;
+            }
+            else
+            {
+                nextMenu.Importance = nextMenu.Importance - num;
+                vMenu.Importance = vMenu.Importance + num;
+            }
+           
+
+            Update(vMenu);
+            Update(nextMenu);
+           // _unitOfWork.SaveChanges();
+
+           // ResetSort(vMenu.CategoryId);
             return 1;
         }
 

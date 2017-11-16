@@ -12,39 +12,32 @@
 
 @section header{
 
- }
-
-            <div class="panel panel-default">
-                <header class="panel-heading">
-                    <a asp-controller="User" asp-action="Create" data-ajax = "true" data-ajax-method = "GET" data-ajax-mode = "replace" data-ajax-update="#edit-container"
-                       data-ajax-begin = "onBegin" data-ajax-complete = "onComplete" data-ajax-failure = "onFailed" data-ajax-success = "onSuccess" ><i class="fa fa-plus fa-fw"></i>创建新用户</a>
+}
+<div class="row">
+    <div class="col-auto mr-auto">
+        <form asp-controller="User" asp-action="Index" method="get" class="form-inline mb-2">
+            <label class="sr-only" for="Username">用户名</label>
+            @Html.EditorFor(model => model.Keyword, new {htmlAttributes = new {@class = "form-control mb-2 mr-sm-2 mb-sm-0", placeholder = "用户名"}})
+                       
+            <label class="sr-only" for="StartDate">开始日期</label>
+            @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {@class = "form-control mb-2 mr-sm-2 mb-sm-0", placeholder = "开始日期"}})
+                       
+            <label class="sr-only" for="EndDate">结束日期</label>
+            @Html.EditorFor(model => model.EndDate, new {htmlAttributes = new {@class = "form-control mb-2 mr-sm-2 mb-sm-0", placeholder = "结束日期"}})
+                        
+            @Html.DropDownListFor(model => model.RoleId, (IEnumerable<SelectListItem>) ViewBag.Roles, string.Format("--{0}--", EntityNames.Role), new {@class = "form-control mb-2 mr-sm-2 mb-sm-0" })
+                 
+            <button type="submit" class="btn btn-primary"><span class="fa fa-search"></span> 搜索</button>
+        </form>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="User" asp-action="Create" data-ajax = "true" data-ajax-method = "GET" data-ajax-mode = "replace" data-ajax-update="#edit-container"
+           data-ajax-begin = "onBegin" data-ajax-complete = "onComplete" data-ajax-failure = "onFailed" data-ajax-success = "onSuccess" class="btn btn-primary" ><i class="fa fa-plus fa-fw"></i>创建新用户</a>
                
-                    <form asp-controller="User" asp-action="Index" method="get">
+    </div>
+</div>
 
-                        <div class="form-group">
-                            <label class="sr-only" for="Username">用户名</label>
-                            @Html.EditorFor(model => model.Keyword, new {htmlAttributes = new {@class = "form-control", placeholder = "用户名"}})
-                        </div>
-                        <div class="form-group">
-                            <label class="sr-only" for="StartDate">开始日期</label>
-                            @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {@class = "form-control", placeholder = "开始日期"}})
-                        </div>
-                        <div class="form-group">
-                            <label class="sr-only" for="EndDate">结束日期</label>
-                            @Html.EditorFor(model => model.EndDate, new {htmlAttributes = new {@class = "form-control", placeholder = "结束日期"}})
-                        </div>
-                        @Html.DropDownListFor(model => model.RoleId, (IEnumerable<SelectListItem>) ViewBag.Roles, string.Format("--{0}--", EntityNames.Role), new {@class = "form-control"})
-                        @*<div class="form-group">
-                @Html.DropDownList("DepartmentId", null, "--所属部门--", htmlAttributes: new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.DropDownList("PositionId", null, "--所在岗位--", htmlAttributes: new { @class = "form-control" })
-            </div>*@
-                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> 搜索</button>
-                    </form>
-
-                </header>
-          
+   
                 <table class="table table-bordered table-striped table-vmiddle">
                     <thead>
                     <tr>
@@ -86,7 +79,7 @@
                 <div class="panel-footer">                   
 
                     <div class="row">
-                        <div class="col-sm-7">
+                        <div class="col-auto mr-auto">
                             <nav>
                                 <ul class="pagination">
                                     @{
@@ -168,23 +161,19 @@
                                 </ul>
                             </nav>
                         </div>
-                        <div class="col-sm-5">
-                            <div class="form-inline text-right">
-                                <div class="input-group">
-                                    <span class="input-group-addon" id="basic-addon3"> 总记录<strong>@Model.TotalCount</strong>条，分页</span>
-                                    @Html.DropDownListFor(m => Model.PageSize, (SelectList)ViewBag.PageSizes, "分页", new { @class = "form-control" })
-                                </div>
+                        <div class="col-auto">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="btnGroupAddon2"> 总记录<strong>@Model.TotalCount</strong>条，分页</span>
+                                @Html.DropDownListFor(m => Model.PageSize, (SelectList)ViewBag.PageSizes, "分页", new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-     
+         
 
 
 <div id="edit-container">
 </div>
-
 <div id="role-container">
 </div>
 <div id="pwd-container">
@@ -192,7 +181,7 @@
 
 
 
-@section Footer {
+@section footer {
 
 <script src="~/js/lib/jquery/plugins/jquery.validate.min.js"></script>
 <script src="~/js/lib/jquery/plugins/jquery.validate.unobtrusive.min.js"></script>
@@ -202,8 +191,26 @@
     <script>
         var modelName = "@EntityNames.User";
 
+        function onBegin() {
+            var iconEl = $(this).find("i.fa");
+            var icon = iconEl.attr("data-icon");
+            iconEl.removeClass(icon).addClass("fa-spinner fa-spin");
+        }
+        function onComplete() {
+            var iconEl = $(this).find("i.fa");
+            var icon = iconEl.attr("data-icon");
+            iconEl.removeClass("fa-spinner fa-spin").addClass(icon);
+            $('#ModalEdit').modal();
+        }
+        function onSuccess(data) {
+           
+        }
+        function onFailed() {
+            toastr.error("操作失败！");
+        }
+
         function OnSuccessLink(data) {
-            Common.ShowBox(data.Status,data.Message,"操作")
+            Common.ShowBox(data.Status, data.Message, "操作");
         }
 
         function onAjaxComplete() {
@@ -211,28 +218,42 @@
         }
 
         function onBeginSave() {
-            $("#btnSave i").removeClass("fa-save").addClass("fa-spinner fa-spin")
+            $("#btnSave i").removeClass("fa-save").addClass("fa-spinner fa-spin");
         }
         function onCompleteSave() {
             $("#btnSave i").removeClass("fa-spinner fa-spin").addClass("fa-save")
         }
 
         
-        function onSuccess(data) {
+        function onSuccessSave(data) {
             var title = '@ViewBag.PageTitle';
             Common.ShowBoxWithFuncBack(data, title, submitSuccess);
         }
 
         function submitSuccess(id, htmlData) {
             $('#ModalEdit').modal('hide');
-            console.log(id);
-            if (id != null) {
-                var cid = "container" + id;
-                $("#" + cid).replaceWith(htmlData);
+         
+            if (id === "0" ) {
+                //  var cid = "container" + id;
+                //   $("#" + cid).replaceWith(htmlData);
+                var url = "@Url.Action("Index")";
+                $.get(url,
+                    function (result) {
+                      
+                        //$("#" + cid).replaceWith(result);
+                        $("#tbList").html(result);
+                    });
             }
             else {
-                $("#tbList").html(htmlData);
-
+              
+                var cid = "container" + id;
+                //   $("#" + cid).replaceWith(htmlData);
+                var url = "@Url.Action("GetUserForItem")/" + id;
+                $.get(url,
+                    function (result) {
+                        console.log(result);
+                        $("#" + cid).replaceWith(result);
+                    });
             }
         }
 
@@ -244,7 +265,7 @@
 
             $.validator.addMethod('qq', function (value, element) {
                 if (value.length > 0)
-                    return /^[1-9][0-9]{4,9}$/.test(value)
+                    return /^[1-9][0-9]{4,9}$/.test(value);
                 return true;
             });
             $.validator.unobtrusive.adapters.addBool("qq");
@@ -264,7 +285,7 @@
         //========== edit user ===========
 
         function SetPasswordSuccess(data) {
-            Common.ShowBoxWithFunc(data,"重设密码",funcRestPwdOK)
+            Common.ShowBoxWithFunc(data, "重设密码", funcRestPwdOK);
             @*switch (data.Status) {
                 case 2:
                     toastr.error(data.Message, '@modelName');
@@ -321,20 +342,6 @@
 
             });
                       
-
-
-            //active
-            $(document).on("click", '.active-item', function (e) {
-                e.preventDefault();
-
-                var url = $(this).attr('data-url'), title = $(this).attr('title'), that = $(this);
-                Common.SingleActionWithFuncBack(url, title, that, submitFunc);
-
-            });
-
-            function submitFunc(that, data) {
-                var tr = that.closest('.item-container').replaceWith(data);
-            }
 
 
         });

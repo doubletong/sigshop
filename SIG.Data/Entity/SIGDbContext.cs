@@ -17,7 +17,7 @@ namespace SIG.Data.Entity
         public SIGDbContext(DbContextOptions<SIGDbContext> options) : base(options)
         {
         }
-
+        public SIGDbContext() { }
         //public virtual DbSet<ArticleCategory> ArticleCategory { get; set; }
         //public virtual DbSet<Article> Article { get; set; }
         //public virtual DbSet<Comment> Comment { get; set; }

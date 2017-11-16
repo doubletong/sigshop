@@ -188,24 +188,25 @@ input:-webkit-autofill:active {
   margin-bottom: 0; }
 
 nav#menu .mainmenu {
-  border-top: 1px #555555 solid; }
+  border-top: 1px #444 solid; }
   nav#menu .mainmenu > li {
-    font-size: .875rem; }
-    nav#menu .mainmenu > li > a > i {
-      margin-right: .3rem; }
+    font-size: .875rem;
+    border-bottom: 1px #444 solid; }
     nav#menu .mainmenu > li a {
       padding: .7rem .6rem;
       text-decoration: none;
       position: relative;
       display: block;
       color: #eeeeee; }
+      nav#menu .mainmenu > li a > i {
+        margin-right: .3rem; }
       nav#menu .mainmenu > li a.active {
         background-color: #00ae63;
         color: #fff; }
         nav#menu .mainmenu > li a.active::after {
           content: " ";
           position: absolute;
-          top: 10px;
+          top: 1rem;
           right: 0;
           width: 0;
           height: 0;
@@ -222,8 +223,17 @@ nav#menu .mainmenu {
         nav#menu .mainmenu > li a:hover span.badge {
           background-color: #fff;
           color: #2f95cf; }
-      nav#menu .mainmenu > li a li {
-        border-bottom: none; }
+    nav#menu .mainmenu > li ul.submenu {
+      display: none;
+      background-color: #000; }
+      nav#menu .mainmenu > li ul.submenu li a {
+        padding: .5rem .6rem; }
+        nav#menu .mainmenu > li ul.submenu li a.active::after {
+          top: .8rem; }
+    nav#menu .mainmenu > li.nav-open {
+      background-color: #222; }
+      nav#menu .mainmenu > li.nav-open ul.submenu {
+        display: block; }
     nav#menu .mainmenu > li.level2 {
       padding-left: 20px;
       display: none;
@@ -234,12 +244,6 @@ nav#menu .mainmenu {
           color: #fff; }
         nav#menu .mainmenu > li.level2 a.active {
           color: #fff; }
-
-nav#menu .mainmenu li.nav-open {
-  background-color: #222222; }
-
-nav#menu .mainmenu li.nav-open ul.submenu {
-  display: block; }
 
 .closemenu a {
   display: block;
@@ -368,9 +372,6 @@ nav#menu .mainmenu li.nav-open ul.submenu {
   border: 1px #94b1c9 solid;
   background-color: #ffffff;
   color: #0e161c; }
-
-#menu1 > .menuTree {
-  padding-left: 15px; }
 
 .menuTree {
   margin: 0;

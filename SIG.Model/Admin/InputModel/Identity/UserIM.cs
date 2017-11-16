@@ -2,55 +2,42 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using SIG.Data.Enums;
+using SIG.Resources.Admin;
 
 namespace SIG.Model.Admin.InputModel.Identity
 {
     public class UserIM
     {
-        public Guid Id { get; set; }
-
-        [Required]
-        [Display(Name = "用户名")]
+        [Remote("IsUserNameUnique", "User", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "IsExist")]
+        [Required(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "Required")]
+        [Display(ResourceType = typeof(Labels), Name = "UserName")]
         public string UserName { get; set; }
-        [Required]
-        [Display(Name = "邮箱")]
 
+
+        [Display(ResourceType = typeof(Labels), Name = "DisplayName")]
+        public string DisplayName { get; set; }
+
+        [Required(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "Required")]
+        [StringLength(100, ErrorMessageResourceName = "StringLengthWithMiniLength", ErrorMessageResourceType = typeof(Validations), MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(ResourceType = typeof(Labels), Name = "Password")]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(ResourceType = typeof(Labels), Name = "ConfirmPassword")]
+
+
+
+        [Compare("Password", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "ComparePassword")]
+        public string ConfirmPassword { get; set; }
+
+        [Remote("IsEmailUnique", "User", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "IsExist")]
+        [EmailAddress(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "EmailAddressInvalidFormat")]
+        [Required(ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "Required")]
+        [Display(ResourceType = typeof(Labels), Name = "Email")]
         public string Email { get; set; }
-        [Required]
-        public string PasswordHash { get; set; }
-        public string SecurityStamp { get; set; }
-        public string RealName { get; set; }
-        public string PhotoUrl { get; set; }
-        [Display(Name = "激活")]
-        public bool IsActive { get; set; }
-        [Display(Name = "创建日期"), DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime CreateDate { get; set; }
-        [Display(Name = "最后登录时间")]
-        public DateTime? LastActivityDate { get; set; }
-
-        //public Nullable<int> DepartmentId { get; set; }
-        //public Nullable<int> PositionId { get; set; }
-
-        [Display(Name = "生日"), DisplayFormat(DataFormatString = "{0:d}")]
-        public DateTime? Birthday { get; set; }
-        [Display(Name = "性别")]
-        public Gender Gender { get; set; }
-        [Display(Name = "性别")]
-        public string GenderName
-        {
-            get
-            {
-                var enumType = typeof(Gender);
-                var field = enumType.GetFields()
-                           .First(x => x.Name == System.Enum.GetName(enumType, Gender));
-                var attribute = field.GetCustomAttribute<DisplayAttribute>();
-                return attribute.Name;
-
-            }
-        }
-        public string QQ { get; set; }
-        public string Mobile { get; set; }
 
     }
 }

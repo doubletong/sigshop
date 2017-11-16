@@ -507,4 +507,7 @@
   <data name="Specification" xml:space="preserve">
     <value>规格</value>
   </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>角色名称</value>
+  </data>
 </root>
