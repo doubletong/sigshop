@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,11 +22,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.IdentityModel.Tokens;
 using SIG.Infrastructure.Helper;
 using SIG.Services;
 using SIG.Services.Log;
 using SIG.Services.Menus;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SIG.SIGCMS
 {
@@ -86,6 +89,31 @@ namespace SIG.SIGCMS
             services.Configure<RazorViewEngineOptions>(options => {
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
+
+            // Register the Swagger generator, defining one or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "ToDo API",
+                    Description = "A simple example ASP.NET Core Web API",
+                    TermsOfService = "None",
+                    Contact = new Contact { Name = "Shayne Boyer", Email = "", Url = "https://twitter.com/spboyer" },
+                    License = new License { Name = "Use under LICX", Url = "https://example.com/license" }
+                });
+            
+                c.SwaggerDoc("v2", new Info { Title = "My API - V2", Version = "v2" });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+                var xmlPath = Path.Combine(basePath, "SIG.SIGCMS.xml");
+                c.IncludeXmlComments(xmlPath);
+
+            });
+
+         
+
             //services.AddSingleton<DbContext, SIGDbContext>();
             services.AddSingleton<IUnitOfWork, UnitOfWork<SIGDbContext>>();
             services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
@@ -171,6 +199,15 @@ namespace SIG.SIGCMS
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
+            });
+
+            /*https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio */
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auto Beauty API V1");
+                c.SwaggerEndpoint("/swagger/v2/swagger.json", "My API - V2");
+             
             });
 
         }

@@ -65,8 +65,9 @@ namespace SIG.SIGCMS
 
                 if (currentUser != "admin")
                 {
-               //     context.Succeed(requirement);
-               //     return Task.CompletedTask;
+                   
+                   // context.Succeed(requirement);
+                   // return Task.CompletedTask;
                 }
             }
             var authorizationFilterContext = context.Resource as Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext;

@@ -157,48 +157,7 @@ namespace SIG.SIGCMS.Controllers
         }
 
 
-        [HttpPost]
-        public IActionResult Token([FromBody] LoginIM model)
-        {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest();
-            //}
-
-            var user = _userServices.SignIn(model.Username, model.Password); ;
-
-            if (user == null)
-            {
-                return BadRequest();
-            }
-
-
-            var token = GetJwtSecurityToken(user);
-
-            return Ok(new JwtSecurityTokenHandler().WriteToken(token));
-        }
-        private JwtSecurityToken GetJwtSecurityToken(User user)
-        {
-            // var userClaims = await _userManager.GetClaimsAsync(user);
-            // create claims
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Sid, user.Id.ToString()),
-                new Claim("RealName", user.RealName??"无"),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenOptions.Key));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            return new JwtSecurityToken(
-                issuer: _tokenOptions.Issuer,
-                audience: _tokenOptions.Issuer,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(10),
-                signingCredentials: creds
-            );
-        }
+       
         #region " Ajax "
 
 

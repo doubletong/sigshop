@@ -14,6 +14,11 @@ namespace SIG.SIGCMS.Controllers
     //[Authorize(Policy = "Permission")]
     public class TestController : Controller
     {
+
+        /// <summary>
+        /// Deletes a specific TodoItem.
+        /// </summary>
+        /// <param name="id"></param>     
         [HttpGet]
         // [Produces("application/json")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
