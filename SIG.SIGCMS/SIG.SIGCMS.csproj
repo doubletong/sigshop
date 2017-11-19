@@ -41,6 +41,10 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\KendoAdmin\Controllers\" />
+    <Folder Include="Areas\KendoAdmin\Data\" />
+    <Folder Include="Areas\KendoAdmin\Models\" />
+    <Folder Include="Areas\KendoAdmin\Views\" />
     <Folder Include="wwwroot\public\img\" />
   </ItemGroup>
 
