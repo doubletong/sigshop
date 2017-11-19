@@ -8,17 +8,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.DataAnnotations" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SIG.EntityFrameworkCore.AutoHistory\SIG.EntityFrameworkCore.AutoHistory.csproj" />
     <ProjectReference Include="..\SIG.Infrastructure\SIG.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.Build.Framework.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

@@ -10,39 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Hosting">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hosting\2.0.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Hosting.Abstractions">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hosting.abstractions\2.0.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Http">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http\2.0.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.abstractions\2.0.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.ViewFeatures">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.viewfeatures\2.0.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Abstractions">
-      <HintPath>C:\Users\doubletong\.nuget\packages\microsoft.extensions.caching.abstractions\2.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Memory">
-      <HintPath>C:\Users\doubletong\.nuget\packages\microsoft.extensions.caching.memory\2.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Options">
-      <HintPath>C:\Users\doubletong\.nuget\packages\microsoft.extensions.options\2.0.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.PlatformAbstractions">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.platformabstractions\1.1.0\lib\netstandard1.3\Microsoft.Extensions.PlatformAbstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Annotations">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.0.0\ref\netcoreapp2.0\System.ComponentModel.Annotations.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
   </ItemGroup>
 
 </Project>

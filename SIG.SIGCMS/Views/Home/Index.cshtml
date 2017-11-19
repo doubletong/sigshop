@@ -1,7 +1,9 @@
-﻿
+﻿@using System;
 @{
     ViewData["Title"] = "Index";
+    OperatingSystem os = Environment.OSVersion;
+
 }
 
-<h2>Index000000</h2>
+<h2>Index000000  @os.Platform.ToString()</h2>
 

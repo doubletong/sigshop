@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -40,10 +38,16 @@ namespace SIG.Infrastructure.Configs
           
             if (string.IsNullOrEmpty(fileName))
             {
-                //IHostingEnvironment env = new HostingEnvironment();
-                //var webRootInfo = env.WebRootPath;
+                
+
                 fileName = PlatformServices.Default.MapPath(string.Concat("/Config/", typeof(T).Name, ".config"));
                 fileName = fileName.ToLower().Replace(@"\bin\debug\netcoreapp2.0", "");
+
+                OperatingSystem os = Environment.OSVersion;
+                if(os.Platform == PlatformID.Unix){
+                    fileName = PlatformServices.Default.MapPath(string.Concat("/Config/", typeof(T).Name, ".config"));
+                    fileName = fileName.ToLower().Replace(@"/bin/debug/netcoreapp2.0", "");
+                }
 
                 //fileName = string.Concat("/Config/", typeof(T).Name, ".config").Replace("/", "\\");
                 //if (fileName.StartsWith("\\"))
@@ -88,7 +92,7 @@ namespace SIG.Infrastructure.Configs
                 //ILoggingService _logger = new LoggingService();
                 //_logger.Error(LogUtility.BuildExceptionMessage(ex));
                 //LoggingFactory.GetLogger().Fatal(LogUtility.BuildExceptionMessage(ex));
-                throw;
+                throw ex;
             }
             finally
             {
