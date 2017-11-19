@@ -45,8 +45,9 @@ namespace SIG.Infrastructure.Configs
 
                 OperatingSystem os = Environment.OSVersion;
                 if(os.Platform == PlatformID.Unix){
-                    fileName = PlatformServices.Default.MapPath(string.Concat("/Config/", typeof(T).Name, ".config"));
-                    fileName = fileName.ToLower().Replace(@"/bin/debug/netcoreapp2.0", "");
+                    fileName = PlatformServices.Default.MapPath("/Config");
+                    fileName = fileName.Replace(@"/bin/Debug/netcoreapp2.0", "");
+                    fileName = Path.Combine(fileName, $"{typeof(T).Name}.config");
                 }
 
                 //fileName = string.Concat("/Config/", typeof(T).Name, ".config").Replace("/", "\\");
