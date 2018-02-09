@@ -58,18 +58,29 @@ namespace SIG.SIGCMS
                 .AddUnitOfWork<SIGDbContext>();
 
             services.AddAuthentication(
-                options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            }
+            //    options =>
+            //{
+            //    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}
             ).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
                 options.LoginPath = new PathString("/Account/LogIn");
                 options.LogoutPath = new PathString("/Account/LogOff");
                 options.AccessDeniedPath = new PathString("/Errors/AccessDenied");
-            });
+            })
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = Configuration["TokenOptions:Issuer"],
+                        ValidAudience = Configuration["TokenOptions:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenOptions:Key"])),
+                    };
+                });
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Permission", policy => policy.Requirements.Add(new PermissionRequirement("/errors/accessdenied")));
@@ -91,7 +102,7 @@ namespace SIG.SIGCMS
                     Contact = new Contact { Name = "Shayne Boyer", Email = "", Url = "https://twitter.com/spboyer" },
                     License = new License { Name = "Use under LICX", Url = "https://example.com/license" }
                 });
-            
+
                 c.SwaggerDoc("v2", new Info { Title = "My API - V2", Version = "v2" });
 
                 // Set the comments path for the Swagger JSON and UI.
@@ -101,9 +112,9 @@ namespace SIG.SIGCMS
 
             });
 
-         
 
-         
+
+
 
             services.AddMemoryCache();
             services.AddMvc();
@@ -134,7 +145,7 @@ namespace SIG.SIGCMS
         {
             //add NLog to ASP.NET Core
             loggerFactory.AddNLog();
-           
+
             ////add NLog.Web
             app.AddNLogWeb();
             //needed for non-NETSTANDARD platforms: configure nlog.config in your project root. NB: you need NLog.Web.AspNetCore package for this.         
@@ -152,7 +163,7 @@ namespace SIG.SIGCMS
             {
                 //生产环境异常处理
                 //MVC 页面跳转
-                app.UseExceptionHandler("/Errors");
+                app.UseExceptionHandler("/Error");
 
                 //webapi 提示错误
                 //app.UseExceptionHandler(appBuilder =>
@@ -193,7 +204,7 @@ namespace SIG.SIGCMS
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auto Beauty API V1");
                 c.SwaggerEndpoint("/swagger/v2/swagger.json", "My API - V2");
-             
+
             });
 
         }

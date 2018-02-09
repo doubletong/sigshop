@@ -23,9 +23,6 @@ namespace SIG.Model.Admin.InputModel.Identity
 
         [DataType(DataType.Password)]
         [Display(ResourceType = typeof(Labels), Name = "ConfirmPassword")]
-
-
-
         [Compare("Password", ErrorMessageResourceType = typeof(Validations), ErrorMessageResourceName = "ComparePassword")]
         public string ConfirmPassword { get; set; }
 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SIG.SIGCMS.Controllers
 {
-    public class ErrorController : BaseController
+    public class ErrorsController : BaseController
     {
         public IActionResult Index(int statusCode)
         {

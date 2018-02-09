@@ -100,18 +100,18 @@ namespace SIG.SIGCMS
                 }
                 var userId = httpContext.User.Claims.SingleOrDefault(s => s.Type == ClaimTypes.Sid)?.Value;
                 RoleMenus = _menuServices.GetRolesMenusByUserId(new Guid(userId)).Result;
-                bool hasCurrentControllerRole = RoleMenus.Where(w => w.Action?.ToLower() == _actionName.ToLower() && w.Area == areaName.ToLower() && 
-                    w.Controller == controllerName.ToLower()).Any();
+                bool hasCurrentControllerRole = RoleMenus.Where(w => w.Action?.ToLower() == _actionName.ToLower() && w.Area?.ToLower() == areaName.ToLower() && 
+                    w.Controller?.ToLower() == controllerName.ToLower()).Any();
                 if (hasCurrentControllerRole)
                 {
                     //当前用户角色名
-                    var roleName = httpContext.User.Claims.SingleOrDefault(s => s.Type == ClaimTypes.Role).Value.Split(",");
-                    if (RoleMenus.Where(w => /*roleName.Contains(w.RoleName) &&*/ w.Controller == controllerName.ToLower() && 
-                    w.Action?.ToLower() == _actionName.ToLower() && w.Area == areaName.ToLower()).Any())
-                    {
+                    //var roleName = httpContext.User.Claims.SingleOrDefault(s => s.Type == ClaimTypes.Role).Value.Split(",");
+                    //if (RoleMenus.Where(w => /*roleName.Contains(w.RoleName) &&*/ w.Controller == controllerName.ToLower() && 
+                    //w.Action?.ToLower() == _actionName.ToLower() && w.Area == areaName.ToLower()).Any())
+                    //{
                         //有权限标记处理成功
                         context.Succeed(requirement);
-                    }
+                    //}
                 }
             }
             return Task.CompletedTask;

@@ -48,6 +48,7 @@ namespace SIG.SIGCMS.Controllers
         [HttpPost]
         public IActionResult Register(RegisterIM model)
         {
+
             if (!ModelState.IsValid)
             {
                 var errorMes = GetModelErrorMessage();
